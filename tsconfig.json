@@ -1,0 +1,16 @@
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.web.json" }],
+  "compilerOptions": {
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": true,
+    "types": ["bun-types"],
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/renderer/src/*"
+      ]
+    }
+  }
+}

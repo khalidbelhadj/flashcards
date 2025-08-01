@@ -1,0 +1,73 @@
+import { app, shell, BrowserWindow, ipcMain, nativeTheme } from "electron";
+import { join } from "path";
+import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+import { registerApis } from "src/lib/api";
+
+const createWindow = (): void => {
+  nativeTheme.themeSource = "light";
+
+  const mainWindow = new BrowserWindow({
+    width: 750,
+    height: 750,
+    show: false,
+    minWidth: 500,
+    minHeight: 500,
+    autoHideMenuBar: true,
+    titleBarStyle: "hidden",
+    trafficLightPosition: {
+      x: 10,
+      y: 10,
+    },
+    webPreferences: {
+      preload: join(__dirname, "../preload/index.js"),
+      sandbox: false,
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  mainWindow.on("ready-to-show", () => {
+    mainWindow.show();
+  });
+
+  mainWindow.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url);
+    return { action: "deny" };
+  });
+
+  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
+  } else {
+    mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
+  }
+};
+
+app.whenReady().then(() => {
+  electronApp.setAppUserModelId("com.flashcards");
+
+  app.on("browser-window-created", (_, window) => {
+    optimizer.watchWindowShortcuts(window);
+  });
+
+  registerApis();
+  createWindow();
+
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
+});
+
+ipcMain.handle("open-settings", async (_) => {
+  try {
+    await shell.openPath("/Users/khalid/Developer/flashcardsv2/settings.json");
+  } catch (e) {
+    console.log("fail");
+    console.log(e);
+  }
+});

@@ -1,0 +1,16 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
+  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/**/*", "src/lib/**/*", "src/renderer/src/lib/service-proxy.ts"],
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["electron-vite/node", "bun-types"],
+    "baseUrl": "./",
+    "composite": true,
+    "paths": {
+      "@/*": [
+        "src/renderer/src/*"
+      ]
+    }
+  }
+}
