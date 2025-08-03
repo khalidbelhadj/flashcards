@@ -1,5 +1,4 @@
 import { relations } from "drizzle-orm";
-import { AnyPgColumn } from "drizzle-orm/pg-core";
 import { AnySQLiteColumn } from "drizzle-orm/sqlite-core";
 import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { v4 as uuidv4 } from "uuid";
@@ -34,6 +33,7 @@ export const decksRelations = relations(decksTable, ({ many, one }) => ({
   cards: many(cardsTable, {
     relationName: "cards",
   }),
+  reviews: many(reviewsTable),
 }));
 
 export const cardsTable = sqliteTable("cards", {
@@ -59,11 +59,39 @@ export const cardsTable = sqliteTable("cards", {
     .$default(() => "new"),
 });
 
-export const cardsRelations = relations(cardsTable, ({ one }) => ({
+export const cardsRelations = relations(cardsTable, ({ one, many }) => ({
   deck: one(decksTable, {
     fields: [cardsTable.deckId],
     references: [decksTable.id],
     relationName: "cards",
+  }),
+  reviews: many(reviewsTable),
+}));
+
+export const reviewsTable = sqliteTable("reviews", {
+  id: text("id")
+    .primaryKey()
+    .notNull()
+    .$default(() => uuidv4()),
+  deckId: text("deck_id")
+    .notNull()
+    .references(() => decksTable.id),
+  cardId: text("card_id")
+    .notNull()
+    .references(() => cardsTable.id),
+  createdAt: text("created_at")
+    .notNull()
+    .$default(() => new Date().toISOString()),
+});
+
+export const reviewsRelations = relations(reviewsTable, ({ one }) => ({
+  deck: one(decksTable, {
+    fields: [reviewsTable.deckId],
+    references: [decksTable.id],
+  }),
+  card: one(cardsTable, {
+    fields: [reviewsTable.cardId],
+    references: [cardsTable.id],
   }),
 }));
 

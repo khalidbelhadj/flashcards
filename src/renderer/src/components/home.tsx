@@ -5,10 +5,12 @@ import {
   IconArrowsMove,
   IconChevronRight,
   IconCube,
+  IconCube3dSphere,
   IconDots,
   IconEdit,
   IconFoldDown,
   IconFoldUp,
+  IconHistory,
   IconLayoutNavbarCollapse,
   IconLayoutNavbarExpand,
   IconPlus,
@@ -274,6 +276,20 @@ export default function Home() {
     <div className="w-full h-full flex flex-col items-center py-16 gap-10 overflow-clip max-h-screen">
       {/* <Heatmap /> */}
       <Decks />
+      <div className="flex gap-1">
+        <Button variant="outline">
+          <IconSettings className="size-4" />
+          Settings
+        </Button>
+        <Button variant="outline">
+          <IconHistory className="size-4" />
+          History
+        </Button>
+        <Button variant="outline">
+          <IconCube3dSphere className="size-4" />
+          All Cards
+        </Button>
+      </div>
     </div>
   );
 }
