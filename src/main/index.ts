@@ -1,6 +1,6 @@
-import { app, shell, BrowserWindow, ipcMain, nativeTheme } from "electron";
+import { electronApp, is, optimizer } from "@electron-toolkit/utils";
+import { app, BrowserWindow, ipcMain, nativeTheme, shell } from "electron";
 import { join } from "path";
-import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import { registerApis } from "src/lib/api";
 
 const createWindow = (): void => {
@@ -15,8 +15,8 @@ const createWindow = (): void => {
     autoHideMenuBar: true,
     titleBarStyle: "hidden",
     trafficLightPosition: {
-      x: 10,
-      y: 10,
+      x: 14,
+      y: 14,
     },
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),

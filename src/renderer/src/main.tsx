@@ -1,16 +1,11 @@
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./assets/main.css";
 
-import { createRoot } from "react-dom/client";
-import { StrictMode } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import App from "@/app";
-import {
-  createHashRouter,
-  HashRouter,
-  MemoryRouter,
-  RouterProvider,
-} from "react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { MemoryRouter } from "react-router";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,10 +23,12 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          <App />
-        </MemoryRouter>
-        {/* <ReactQueryDevtools initialIsOpen={!true} /> */}
+        <TooltipProvider>
+          <MemoryRouter>
+            <App />
+          </MemoryRouter>
+          {/* <ReactQueryDevtools initialIsOpen={!true} /> */}
+        </TooltipProvider>
       </QueryClientProvider>
     </StrictMode>,
   );

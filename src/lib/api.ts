@@ -1,10 +1,12 @@
 import { ipcMain } from "electron";
-import * as decksApi from "src/lib/decks-api";
 import * as cardsApi from "src/lib/cards-api";
+import * as decksApi from "src/lib/decks-api";
+import * as reviewsApi from "src/lib/reviews-api";
 
 export const api = {
   decks: decksApi,
   cards: cardsApi,
+  reviews: reviewsApi,
 } as const;
 
 export type Api = typeof api;

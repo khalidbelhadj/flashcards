@@ -1,7 +1,7 @@
-import { useParams } from "react-router";
-import DeckInfo from "@/components/deck-info";
 import Cards from "@/components/cards";
 import DeckHeader from "@/components/deck-header";
+import DeckInfo from "@/components/deck-info";
+import { useParams } from "react-router";
 
 export default function Deck() {
   const { id } = useParams<{ id: string }>();

@@ -1,10 +1,10 @@
 import { useCards } from "@/queries/card-queries";
 import { useDeck, useDeckPath } from "@/queries/deck-queries";
+import { useCreateReview } from "@/queries/review-queries";
+import { IconArrowLeft, IconCube3dSphere } from "@tabler/icons-react";
 import { useState } from "react";
 import { NavLink, useParams } from "react-router";
-import DeckHeader from "./deck-header";
 import { Button } from "./ui/button";
-import { IconArrowLeft, IconCube3dSphere, IconX } from "@tabler/icons-react";
 
 import {
   Breadcrumb,
@@ -35,6 +35,8 @@ export function Review() {
   const { data: cards } = useCards(id);
   const { data: path, isPending, isError } = useDeckPath(id);
 
+  const { mutateAsync: createReview } = useCreateReview();
+
   if (deck === undefined || cards === undefined) {
     return <div>Loading...</div>;
   }
@@ -43,21 +45,41 @@ export function Review() {
     setCardIdx((prev) => Math.min(prev + 1, cards.length));
   };
 
-  const handlePrev = () => {
-    setCardIdx((prev) => Math.max(prev - 1, 0));
-  };
-
-  const handleHard = () => {
+  const handleHard = async () => {
+    const card = cards[cardIdx];
+    if (card) {
+      await createReview({
+        deckId: id,
+        cardId: card.id,
+        rating: "hard",
+      });
+    }
     handleNext();
     setShow(false);
   };
 
-  const handleGood = () => {
+  const handleGood = async () => {
+    const card = cards[cardIdx];
+    if (card) {
+      await createReview({
+        deckId: id,
+        cardId: card.id,
+        rating: "good",
+      });
+    }
     handleNext();
     setShow(false);
   };
 
-  const handleEasy = () => {
+  const handleEasy = async () => {
+    const card = cards[cardIdx];
+    if (card) {
+      await createReview({
+        deckId: id,
+        cardId: card.id,
+        rating: "easy",
+      });
+    }
     handleNext();
     setShow(false);
   };
@@ -67,11 +89,14 @@ export function Review() {
   return (
     <div className="w-full h-full relative">
       <header className="flex items-center p-2 gap-2 pl-20 relative">
-        <Button className="" size="sm" variant="outline" asChild>
-          <NavLink to={`/decks/${deck.id}`}>
-            <IconArrowLeft className="size-4" />
-            Exit
-          </NavLink>
+        <Button
+          className=""
+          size="sm"
+          variant="outline"
+          asChild
+          icon={<IconArrowLeft className="size-4" />}
+        >
+          <NavLink to={`/decks/${deck.id}`}>Exit</NavLink>
         </Button>
         <Breadcrumb className="absolute left-1/2 -translate-x-1/2 ">
           <BreadcrumbList className="flex-nowrap">
@@ -137,6 +162,45 @@ export function Review() {
           </BreadcrumbList>
         </Breadcrumb>
       </header>
+
+      {cards.length > 0 && (
+        <div className="flex items-center justify-center p-4">
+          <div className="w-96 bg-neutral-200 border border-neutral-300 h-5 rounded-full overflow-clip">
+            <div
+              className="bg-success h-full transition-all ease-in-out duration-300"
+              style={{
+                width: `${(cardIdx / cards.length) * 100}%`,
+              }}
+            ></div>
+          </div>
+        </div>
+      )}
+      {/* <input
+        type="range"
+        step={1}
+        min={0}
+        max={maxProgress}
+        value={progress}
+        onChange={(e) => setProgress(Number(e.target.value))}
+        className="w-full"
+      />
+      <div className="flex items-center justify-center p-4">
+        <Button
+          onClick={() => {
+            setProgress((p) => Math.max(p - 1, 0));
+          }}
+        >
+          -
+        </Button>
+        <Button
+          onClick={() => {
+            setProgress((p) => Math.min(p + 1, maxProgress));
+          }}
+        >
+          +
+        </Button>
+      </div> */}
+
       <main className="w-lg mx-auto pt-16 px-5 ">
         {cardIdx >= cards.length && (
           <div className="flex flex-col items-center">

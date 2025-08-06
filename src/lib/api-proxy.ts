@@ -34,4 +34,5 @@ function createServiceProxy<T extends keyof Api>(serviceName: T): Api[T] {
 export const api: Api = {
   decks: createServiceProxy("decks"),
   cards: createServiceProxy("cards"),
+  reviews: createServiceProxy("reviews"),
 };

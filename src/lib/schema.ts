@@ -1,6 +1,5 @@
 import { relations } from "drizzle-orm";
-import { AnySQLiteColumn } from "drizzle-orm/sqlite-core";
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { AnySQLiteColumn, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { v4 as uuidv4 } from "uuid";
 
 export const decksTable = sqliteTable("decks", {
@@ -33,7 +32,7 @@ export const decksRelations = relations(decksTable, ({ many, one }) => ({
   cards: many(cardsTable, {
     relationName: "cards",
   }),
-  reviews: many(reviewsTable),
+  reviews: many(reviewsTable, { relationName: "reviews_deck" }),
 }));
 
 export const cardsTable = sqliteTable("cards", {
@@ -46,6 +45,7 @@ export const cardsTable = sqliteTable("cards", {
     .references(() => decksTable.id, { onDelete: "cascade" }),
   front: text("front").notNull(),
   back: text("back").notNull(),
+  lastReview: text("last_review"),
   createdAt: text("created_at")
     .notNull()
     .$default(() => new Date().toISOString()),
@@ -53,7 +53,7 @@ export const cardsTable = sqliteTable("cards", {
     .notNull()
     .$default(() => new Date().toISOString()),
   status: text({
-    enum: ["new", "learning", "due"],
+    enum: ["new", "learning", "reviewing"],
   })
     .notNull()
     .$default(() => "new"),
@@ -65,7 +65,7 @@ export const cardsRelations = relations(cardsTable, ({ one, many }) => ({
     references: [decksTable.id],
     relationName: "cards",
   }),
-  reviews: many(reviewsTable),
+  reviews: many(reviewsTable, { relationName: "reviews_card" }),
 }));
 
 export const reviewsTable = sqliteTable("reviews", {
@@ -75,10 +75,13 @@ export const reviewsTable = sqliteTable("reviews", {
     .$default(() => uuidv4()),
   deckId: text("deck_id")
     .notNull()
-    .references(() => decksTable.id),
+    .references(() => decksTable.id, { onDelete: "cascade" }),
   cardId: text("card_id")
     .notNull()
-    .references(() => cardsTable.id),
+    .references(() => cardsTable.id, { onDelete: "cascade" }),
+  rating: text("rating", {
+    enum: ["hard", "good", "easy"],
+  }).notNull(),
   createdAt: text("created_at")
     .notNull()
     .$default(() => new Date().toISOString()),
@@ -86,10 +89,12 @@ export const reviewsTable = sqliteTable("reviews", {
 
 export const reviewsRelations = relations(reviewsTable, ({ one }) => ({
   deck: one(decksTable, {
+    relationName: "reviews_deck",
     fields: [reviewsTable.deckId],
     references: [decksTable.id],
   }),
   card: one(cardsTable, {
+    relationName: "reviews_card",
     fields: [reviewsTable.cardId],
     references: [cardsTable.id],
   }),
@@ -97,3 +102,4 @@ export const reviewsRelations = relations(reviewsTable, ({ one }) => ({
 
 export type DecksRow = typeof decksTable.$inferSelect;
 export type CardsRow = typeof cardsTable.$inferSelect;
+export type ReviewsRow = typeof reviewsTable.$inferSelect;

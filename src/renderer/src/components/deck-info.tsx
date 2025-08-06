@@ -1,37 +1,17 @@
-import { Button } from "@/components/ui/button";
-import { NavLink, useNavigate } from "react-router";
-import {
-  IconChevronRight,
-  IconCircleDashed,
-  IconCube,
-  IconPlus,
-} from "@tabler/icons-react";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { cn, formatDate } from "@/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  useDeck,
-  useDeckPath,
-  useDecks,
-  useRenameDeck,
-  useSetLastReviewed,
-} from "@/queries/deck-queries";
-import { useCards } from "@/queries/card-queries";
-import { useRef, useState } from "react";
 import NewDeckDialog from "@/components/new-deck-dialog";
+import ProjectIcon from "@/components/project-icon";
+import RenameDeckDialogue from "@/components/rename-deck-dialog";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn, formatDate } from "@/lib/utils";
+import { useDeck, useDecks, useSetLastReviewed } from "@/queries/deck-queries";
+import { IconCircleDashed, IconPlus } from "@tabler/icons-react";
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router";
 
 export default function DeckInfo({ id }: { id: string }) {
+  const [newDeckOpen, setNewDeckOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
-  const renameRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   const {
@@ -46,19 +26,6 @@ export default function DeckInfo({ id }: { id: string }) {
   } = useDecks(id);
   const { mutateAsync: setLastReviewed } = useSetLastReviewed(id);
 
-  const { mutateAsync: renameDeck } = useRenameDeck();
-
-  const handleRenameSave = async () => {
-    if (!deck) return;
-    setRenameOpen(false);
-    const newName = renameRef.current?.value.trim();
-    if (!newName) {
-      alert("Deck name is required");
-      return;
-    }
-    await renameDeck({ id: deck.id, name: newName });
-  };
-
   const handleReview = async () => {
     await setLastReviewed(new Date());
     navigate(`/decks/${id}/review`);
@@ -66,41 +33,27 @@ export default function DeckInfo({ id }: { id: string }) {
 
   return (
     <div className="flex flex-col gap-3 bg-background z-10">
-      <div className="w-full p-5 pt-0 mx-auto">
+      <div className="w-full px-5 mx-auto">
         <div>
           <div className="flex items-center gap-2">
             {/* Title */}
             {!isDeckPending && !isDeckError && (
-              <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="link"
-                    className="text-base font-bold !p-0 text-foreground"
-                  >
-                    {deck.name}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>Rename Deck</DialogHeader>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleRenameSave();
-                    }}
-                  >
-                    <Input
-                      ref={renameRef}
-                      defaultValue={deck.name}
-                      placeholder="Deck Name"
-                    />
-                  </form>
-                  <DialogFooter>
-                    <Button type="submit" onClick={handleRenameSave}>
-                      Save
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+              <>
+                <RenameDeckDialogue
+                  open={renameOpen}
+                  onClose={() => setRenameOpen(false)}
+                  id={deck.id}
+                  name={deck.name}
+                />
+                <Button
+                  variant="ghost"
+                  className="text-base font-medium !p-0 text-foreground gap-1 hover:bg-background hover:text-muted-foreground transition-colors"
+                  icon={<ProjectIcon />}
+                  onClick={() => setRenameOpen(true)}
+                >
+                  {deck.name}
+                </Button>
+              </>
             )}
 
             {isDeckPending && <Skeleton className="h-7 w-36" />}
@@ -112,14 +65,24 @@ export default function DeckInfo({ id }: { id: string }) {
 
             {/* Actions */}
             <div className="flex items-center gap-2 ml-auto">
-              <NewDeckDialog id={id}>
-                <Button className="" variant="outline">
-                  <IconPlus className="size-4" />
-                  New Deck
-                </Button>
-              </NewDeckDialog>
-              <Button className="" variant="default" onClick={handleReview}>
-                <IconCircleDashed className="size-4" />
+              <NewDeckDialog
+                id={id}
+                open={newDeckOpen}
+                onClose={() => setNewDeckOpen(false)}
+              />
+              <Button
+                variant="outline"
+                onClick={() => setNewDeckOpen(true)}
+                icon={<IconPlus />}
+              >
+                New deck
+              </Button>
+              <Button
+                className=""
+                variant="default"
+                onClick={handleReview}
+                icon={<IconCircleDashed />}
+              >
                 Review
               </Button>
             </div>
@@ -136,34 +99,37 @@ export default function DeckInfo({ id }: { id: string }) {
         </div>
 
         {/* Subdecks list */}
-        {
-          <div className="w-full h-fit flex flex-col gap-2 mt-3">
-            <div className="flex items-center gap-2 overflow-auto">
-              {isSubdecksPending &&
-                Array.from({ length: 3 }).map((_) => (
-                  <Skeleton className="min-w-32 w-32 px-2 h-7 rounded-md font-medium flex items-center gap-1"></Skeleton>
-                ))}
-              {isSubdecksError && (
-                <div className="text-sm text-destructive font-medium">
-                  Error: Could not get subdecks
-                </div>
-              )}
-              {!isSubdecksPending &&
-                !isSubdecksError &&
-                subDecks?.map((deck) => (
-                  <NavLink
-                    to={`/decks/${deck.id}`}
-                    className="min-w-32 w-32 px-2 h-7 bg-background border rounded-md font-medium flex items-center gap-1 hover:bg-muted"
-                  >
-                    <div className="size-4">
-                      <IconCube className="size-3.5" />
-                    </div>
-                    <div className="truncate text-sm">{deck.name}</div>
-                  </NavLink>
-                ))}
-            </div>
+        <div
+          className={cn(
+            "w-full h-fit flex flex-col gap-2 pt-3 pb-5",
+            subDecks?.length === 0 && "pt-0",
+          )}
+        >
+          <div className="flex items-center gap-2 overflow-auto">
+            {isSubdecksPending &&
+              Array.from({ length: 3 }).map((_) => (
+                <Skeleton className="min-w-32 w-32 px-2 h-7 rounded-md font-medium flex items-center gap-1"></Skeleton>
+              ))}
+            {isSubdecksError && (
+              <div className="text-sm text-destructive font-medium">
+                Error: Could not get subdecks
+              </div>
+            )}
+            {!isSubdecksPending &&
+              !isSubdecksError &&
+              subDecks?.map((deck) => (
+                <NavLink
+                  to={`/decks/${deck.id}`}
+                  className="min-w-32 w-32 px-2 h-7 bg-background border rounded-md font-medium flex items-center gap-1 hover:bg-accent"
+                >
+                  <div className="size-4">
+                    <ProjectIcon className="size-3.5" />
+                  </div>
+                  <div className="truncate text-sm">{deck.name}</div>
+                </NavLink>
+              ))}
           </div>
-        }
+        </div>
       </div>
     </div>
   );

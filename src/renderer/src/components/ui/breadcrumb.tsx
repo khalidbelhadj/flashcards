@@ -1,6 +1,6 @@
-import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { IconChevronRight, IconDots, IconSlash } from "@tabler/icons-react";
+import { IconChevronRight, IconDots } from "@tabler/icons-react";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -59,7 +59,10 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
       role="link"
       aria-disabled="true"
       aria-current="page"
-      className={cn("text-foreground font-normal", className)}
+      className={cn(
+        "inline-flex items-center gap-0.5 hover:bg-accent text-foreground px-1 rounded-md font-medium",
+        className,
+      )}
       {...props}
     />
   );
@@ -79,7 +82,6 @@ function BreadcrumbSeparator({
       {...props}
     >
       {children ?? <IconChevronRight />}
-      {/* {children ?? <IconSlash className="-rotate-6" />} */}
     </li>
   );
 }
@@ -93,7 +95,10 @@ function BreadcrumbEllipsis({
       data-slot="breadcrumb-ellipsis"
       role="presentation"
       aria-hidden="true"
-      className={cn("flex size-6 items-center justify-center", className)}
+      className={cn(
+        "flex size-5 items-center justify-center cursor-pointer",
+        className,
+      )}
       {...props}
     >
       <IconDots className="size-4" />
@@ -104,10 +109,10 @@ function BreadcrumbEllipsis({
 
 export {
   Breadcrumb,
-  BreadcrumbList,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-  BreadcrumbEllipsis,
 };

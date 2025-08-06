@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { DecksRow } from "src/lib/schema";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -48,4 +49,50 @@ export function formatDate(date: Date) {
  */
 export function formatNumber(num: number, locale?: string): string {
   return new Intl.NumberFormat(locale).format(num);
+}
+
+export type Deck = DecksRow & {
+  cardCount: number;
+  new: number;
+  learning: number;
+  reviewing: number;
+};
+
+export type DeckWithDepth = Deck & { depth: number };
+
+export type Node = Deck & { children: Node[] };
+
+export function buildTree(decks: Deck[]) {
+  const map = new Map<string | null, Node>();
+
+  for (const deck of decks) {
+    map.set(deck.id, { ...deck, children: [] });
+  }
+
+  for (const deck of decks) {
+    const node = map.get(deck.id);
+    const parent = map.get(deck.parentId);
+    if (node && parent) {
+      parent.children.push(node);
+    }
+  }
+
+  return Array.from(map.values()).filter((deck) => deck.parentId === null);
+}
+
+export function flatten(nodes: Node[], expanded: Set<string>) {
+  const result: DeckWithDepth[] = [];
+  const stack = nodes.toReversed().map((node) => ({ ...node, depth: 0 }));
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (current === undefined) throw new Error("Bruh");
+    result.push(current);
+    if (!expanded.has(current.id)) continue;
+    for (const child of current.children) {
+      stack.push({ ...child, depth: current.depth + 1 });
+    }
+  }
+
+  return result;
 }

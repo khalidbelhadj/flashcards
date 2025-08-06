@@ -3,7 +3,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import React, { useState } from "react";
+import { useState } from "react";
 
 const year = 2025;
 
@@ -14,7 +14,7 @@ function getDateFromOffset(baseDate, offset) {
 }
 
 export default function Heatmap() {
-  const [h, setH] = useState(0);
+  const [_, setH] = useState(0);
   const days = Array.from({ length: 365 });
   const firstDay = new Date(`${year}-01-01`);
 

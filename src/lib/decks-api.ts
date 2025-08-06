@@ -17,7 +17,8 @@ export async function getDecks(parentId: string | null) {
       deck: decksTable,
       new: sql<number>`SUM(CASE WHEN ${cardsTable.status} = 'new' THEN 1 ELSE 0 END)`,
       learning: sql<number>`SUM(CASE WHEN ${cardsTable.status} = 'learning' THEN 1 ELSE 0 END)`,
-      due: sql<number>`SUM(CASE WHEN ${cardsTable.status} = 'due' THEN 1 ELSE 0 END)`,
+      reviewing: sql<number>`SUM(CASE WHEN ${cardsTable.status} = 'reviewing' THEN 1 ELSE 0 END)`,
+      cardCount: sql<number>`COUNT(${cardsTable.id})`,
     })
     .from(decksTable)
     .leftJoin(cardsTable, eq(decksTable.id, cardsTable.deckId))
@@ -26,12 +27,10 @@ export async function getDecks(parentId: string | null) {
     .orderBy(desc(decksTable.createdAt))
     .all();
 
-  const result = query.map((row) => ({
-    new: row.new,
-    learning: row.learning,
-    due: row.due,
-    ...row.deck,
-  }));
+  const result = query.map((row) => {
+    const { deck, ...rest } = row;
+    return { ...deck, ...rest };
+  });
   return result;
 }
 
@@ -63,7 +62,8 @@ export async function getById(id: string) {
       deck: decksTable,
       new: sql<number>`SUM(CASE WHEN ${cardsTable.status} = 'new' THEN 1 ELSE 0 END)`,
       learning: sql<number>`SUM(CASE WHEN ${cardsTable.status} = 'learning' THEN 1 ELSE 0 END)`,
-      due: sql<number>`SUM(CASE WHEN ${cardsTable.status} = 'due' THEN 1 ELSE 0 END)`,
+      reviewing: sql<number>`SUM(CASE WHEN ${cardsTable.status} = 'reviewing' THEN 1 ELSE 0 END)`,
+      cardCount: sql<number>`COUNT(${cardsTable.id})`,
     })
     .from(decksTable)
     .leftJoin(cardsTable, eq(decksTable.id, cardsTable.deckId))
@@ -113,6 +113,14 @@ export async function setLastReviewed(id: string, date: string) {
   await db
     .update(decksTable)
     .set({ lastReview: date })
+    .where(eq(decksTable.id, id))
+    .run();
+}
+
+export async function moveDeck(id: string, parentId: string | null) {
+  await db
+    .update(decksTable)
+    .set({ parentId })
     .where(eq(decksTable.id, id))
     .run();
 }

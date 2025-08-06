@@ -1,16 +1,4 @@
 import * as React from "react";
-import {
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  LifeBuoy,
-  Map,
-  PieChart,
-  Send,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
 
 import {
   Sidebar,
@@ -23,12 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {
-  IconCirclePlus,
-  IconCirclePlus2,
-  IconDashboard,
-  IconHome,
-} from "@tabler/icons-react";
+import { IconDashboard } from "@tabler/icons-react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (

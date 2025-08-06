@@ -1,6 +1,6 @@
-import "./compression-polyfill";
 import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
+import "./compression-polyfill";
 import env from "./src/lib/env";
 
 export default defineConfig({

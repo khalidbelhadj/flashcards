@@ -109,3 +109,33 @@ export function useSetLastReviewed(id: string) {
     },
   });
 }
+
+export function useAllDecks() {
+  return useQuery({
+    queryKey: ["decks", "all"],
+    queryFn: async () => {
+      const decks = await api.decks.getDecksRecursive(null);
+      return decks;
+    },
+  });
+}
+
+export function useMoveDeck() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["moveDeck"],
+    mutationFn: async ({
+      id,
+      parentId,
+    }: {
+      id: string;
+      parentId: string | null;
+    }) => {
+      await api.decks.moveDeck(id, parentId);
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["decks"] });
+      await queryClient.invalidateQueries({ queryKey: ["decks-recursive"] });
+    },
+  });
+}
