@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +8,6 @@ import {
 import { Deck } from "@/lib/utils";
 import {
   IconArrowsMove,
-  IconDots,
   IconEdit,
   IconPlus,
   IconTrash,
@@ -38,33 +36,25 @@ export type DeckDialogue =
 export default function DeckDropdown({
   deck,
   setDialogue,
+  children,
+  align = "end",
 }: {
   deck: Deck;
   setDialogue: (dialogue: DeckDialogue) => void;
+  children: React.ReactNode;
+  align?: "start" | "end" | "center";
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          className="p-1 h-full w-fit ml-auto hover:bg-muted"
-          variant="ghost"
-          size="icon"
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-        >
-          <IconDots className="size-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+      <DropdownMenuContent align={align} onClick={(e) => e.stopPropagation()}>
         <DropdownMenuGroup>
           <DropdownMenuItem
             onSelect={() => {
               setDialogue({ type: "new", id: deck.id });
             }}
           >
-            <IconPlus className="size-3.5" />
+            <IconPlus className="size-icon" />
             New deck
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -72,7 +62,7 @@ export default function DeckDropdown({
               setDialogue({ type: "rename", id: deck.id, name: deck.name });
             }}
           >
-            <IconEdit className="size-3.5" />
+            <IconEdit className="size-icon" />
             Rename
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -84,15 +74,15 @@ export default function DeckDropdown({
               });
             }}
           >
-            <IconArrowsMove className="size-3.5" />
-            Move
+            <IconArrowsMove className="size-icon" />
+            Move to
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={async () => {
               setDialogue({ type: "delete", id: deck.id });
             }}
           >
-            <IconTrash className="size-3.5" />
+            <IconTrash className="size-icon" />
             Delete
           </DropdownMenuItem>
         </DropdownMenuGroup>

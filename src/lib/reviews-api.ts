@@ -1,12 +1,12 @@
 import { and, eq } from "drizzle-orm";
 import { updateCardLastReview } from "src/lib/cards-api";
 import db from "src/lib/db";
-import { reviewsTable } from "src/lib/schema";
+import { Rating, reviewsTable } from "src/lib/schema";
 
 export async function createReview(
   deckId: string,
   cardId: string,
-  rating: "hard" | "good" | "easy",
+  rating: Rating,
 ) {
   await db.insert(reviewsTable).values({
     deckId,
@@ -45,5 +45,3 @@ export async function getReviews(deckId?: string, cardId?: string) {
 
   return await db.select().from(reviewsTable).all();
 }
-
-export default {};

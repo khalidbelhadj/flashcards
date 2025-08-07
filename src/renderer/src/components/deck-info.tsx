@@ -1,3 +1,6 @@
+import DeckDropdown, { DeckDialogue } from "@/components/deck-dropdown";
+import DeleteDeckDialog from "@/components/delete-deck-dialog";
+import MoveDeckDialog from "@/components/move-deck-dialog";
 import NewDeckDialog from "@/components/new-deck-dialog";
 import ProjectIcon from "@/components/project-icon";
 import RenameDeckDialogue from "@/components/rename-deck-dialog";
@@ -12,6 +15,8 @@ import { NavLink, useNavigate } from "react-router";
 export default function DeckInfo({ id }: { id: string }) {
   const [newDeckOpen, setNewDeckOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
+
+  const [dialogue, setDialogue] = useState<DeckDialogue | null>(null);
   const navigate = useNavigate();
 
   const {
@@ -39,20 +44,53 @@ export default function DeckInfo({ id }: { id: string }) {
             {/* Title */}
             {!isDeckPending && !isDeckError && (
               <>
-                <RenameDeckDialogue
-                  open={renameOpen}
-                  onClose={() => setRenameOpen(false)}
-                  id={deck.id}
-                  name={deck.name}
-                />
-                <Button
-                  variant="ghost"
-                  className="text-base font-medium !p-0 text-foreground gap-1 hover:bg-background hover:text-muted-foreground transition-colors"
-                  icon={<ProjectIcon />}
-                  onClick={() => setRenameOpen(true)}
+                {dialogue && (
+                  <>
+                    {dialogue.type === "move" && (
+                      <MoveDeckDialog
+                        open={dialogue.type === "move"}
+                        onClose={() => setDialogue(null)}
+                        id={dialogue.id}
+                        parentId={dialogue.parentId}
+                      />
+                    )}
+                    {dialogue.type === "rename" && (
+                      <RenameDeckDialogue
+                        open={dialogue.type === "rename"}
+                        onClose={() => setDialogue(null)}
+                        id={dialogue.id}
+                        name={dialogue.name}
+                      />
+                    )}
+                    {dialogue.type === "new" && (
+                      <NewDeckDialog
+                        id={dialogue.id}
+                        open={dialogue.type === "new"}
+                        onClose={() => setDialogue(null)}
+                      />
+                    )}
+                    {dialogue.type === "delete" && (
+                      <DeleteDeckDialog
+                        id={dialogue.id}
+                        open={dialogue.type === "delete"}
+                        onClose={() => setDialogue(null)}
+                      />
+                    )}
+                  </>
+                )}
+                <DeckDropdown
+                  deck={deck}
+                  setDialogue={setDialogue}
+                  align="start"
                 >
-                  {deck.name}
-                </Button>
+                  <Button
+                    variant="ghost"
+                    className="text-base font-medium !p-0 text-foreground gap-1 hover:bg-background hover:text-muted-foreground transition-colors"
+                    icon={<ProjectIcon />}
+                  >
+                    {deck.name}
+                  </Button>
+                </DeckDropdown>
               </>
             )}
 

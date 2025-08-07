@@ -33,6 +33,28 @@ const deckData = [
 
 // Sample cards for different subjects
 const cardTemplates = {
+  "Web Development": [
+    {
+      front: "What does HTTP stand for and what problem does it solve?",
+      back: "Hypertext Transfer Protocol; it standardizes how clients and servers communicate on the web using requests and responses.",
+    },
+    {
+      front: "What is the difference between HTTP and HTTPS?",
+      back: "HTTPS is HTTP over TLS/SSL, providing encryption, integrity, and authentication.",
+    },
+    {
+      front: "Define REST in the context of web APIs.",
+      back: "Representational State Transfer; an architectural style that uses stateless operations, resources, and standard HTTP methods.",
+    },
+    {
+      front: "What is the role of a CDN?",
+      back: "A Content Delivery Network caches and serves assets from edge locations to reduce latency and offload origin servers.",
+    },
+    {
+      front: "What problem does CORS address?",
+      back: "Cross-Origin Resource Sharing controls which origins can access resources across domain boundaries for security.",
+    },
+  ],
   React: [
     {
       front: "What is JSX?",
@@ -57,6 +79,28 @@ const cardTemplates = {
     {
       front: "What is `useState` used for?",
       back: "It is a Hook that lets you add React state to function components.",
+    },
+  ],
+  Frontend: [
+    {
+      front: "What is the difference between SSR, SSG, and CSR?",
+      back: "SSR renders on the server per request, SSG builds static HTML at build time, CSR renders on the client after JS loads.",
+    },
+    {
+      front: "Why is accessibility (a11y) important on the web?",
+      back: "It ensures content is usable by people with disabilities, improves UX for everyone, and is often a legal requirement.",
+    },
+    {
+      front: "What are web vitals and why do they matter?",
+      back: "Core metrics (e.g., LCP, CLS, INP) that quantify user-perceived performance and impact search ranking and UX.",
+    },
+    {
+      front: "Explain bundling vs. code splitting.",
+      back: "Bundling combines modules into a single file; code splitting creates smaller chunks loaded on demand to improve performance.",
+    },
+    {
+      front: "What is hydration?",
+      back: "The process where client-side JS attaches event listeners to server-rendered HTML to make it interactive.",
     },
   ],
   CSS: [
@@ -104,6 +148,28 @@ const cardTemplates = {
       back: "A minimal and flexible Node.js web application framework.",
     },
   ],
+  Backend: [
+    {
+      front: "What is horizontal vs. vertical scaling?",
+      back: "Vertical increases resources on a single node; horizontal adds more nodes to distribute load.",
+    },
+    {
+      front: "Explain idempotency of HTTP methods.",
+      back: "An operation is idempotent if multiple identical requests have the same effect as one (e.g., GET, PUT, DELETE).",
+    },
+    {
+      front: "What is a message queue used for?",
+      back: "Decoupling services and smoothing load by asynchronously processing tasks (e.g., RabbitMQ, SQS, Kafka).",
+    },
+    {
+      front: "Define ACID in databases.",
+      back: "Atomicity, Consistency, Isolation, Durability — guarantees for reliable transactions.",
+    },
+    {
+      front: "Why use connection pooling?",
+      back: "To reuse DB connections, reducing overhead and improving throughput under load.",
+    },
+  ],
   "Cell Biology": [
     {
       front: "What is the function of the mitochondria?",
@@ -124,6 +190,28 @@ const cardTemplates = {
     {
       front: "What is meiosis?",
       back: "A special type of cell division that reduces the chromosome number by half, creating four haploid cells.",
+    },
+  ],
+  Biology: [
+    {
+      front: "What is the central dogma of molecular biology?",
+      back: "Information flows DNA → RNA → protein via transcription and translation.",
+    },
+    {
+      front: "Define homeostasis.",
+      back: "The tendency of biological systems to maintain stable internal conditions despite external changes.",
+    },
+    {
+      front: "What are the four major classes of biomolecules?",
+      back: "Carbohydrates, lipids, proteins, and nucleic acids.",
+    },
+    {
+      front: "Differentiate genotype and phenotype.",
+      back: "Genotype is the genetic makeup; phenotype is the observable traits resulting from genotype and environment.",
+    },
+    {
+      front: "What is natural selection?",
+      back: "A mechanism of evolution where heritable traits that improve fitness become more common in a population.",
     },
   ],
   Medicine: [
@@ -148,6 +236,28 @@ const cardTemplates = {
       back: "Magnetic resonance imaging, a medical imaging technique used in radiology to form pictures of the anatomy and the physiological processes of the body.",
     },
   ],
+  "Life Sciences": [
+    {
+      front: "What is the scientific method?",
+      back: "A systematic process: observation, hypothesis, experimentation, analysis, conclusion, and replication.",
+    },
+    {
+      front: "Define epidemiology.",
+      back: "The study of the distribution and determinants of health-related states in populations.",
+    },
+    {
+      front: "What is a double-blind study?",
+      back: "A study where neither participants nor researchers know who receives the treatment, reducing bias.",
+    },
+    {
+      front: "Differentiate correlation and causation.",
+      back: "Correlation is association between variables; causation indicates that one variable produces an effect in another.",
+    },
+    {
+      front: "What is peer review?",
+      back: "Evaluation of scientific work by independent experts to ensure quality and validity before publication.",
+    },
+  ],
 };
 
 // Utility function to create timestamp
@@ -157,7 +267,7 @@ function createTimestamp() {
 
 // Function to generate random card status
 function getRandomStatus() {
-  const statuses = ["new", "learning", "review"];
+  const statuses = ["new", "learning", "reviewing"];
   return statuses[Math.floor(Math.random() * statuses.length)];
 }
 

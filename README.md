@@ -1,61 +1,22 @@
 # Flashcards
 
-## Tasks
+Simple flashcards app. The idea is to provide a local [obsidian-like](https://obsidian.md/) experience, with everything being stored locally. There is an emphasis on the user experience being clean and functional, and the app being fast and responsive. Features of this app take inspiration from [Anki](https://apps.ankiweb.net/) and [Mochi](https://mochi.cards/).
 
-- [ ] Card actions
-    - edit
-    - delete
-    - move
-    - reset history
-- [ ] Develop the infra for algorithms
-- [ ] Deck actions in deck header
-- [ ] Deck actions in sub decks list
-- [ ] Sorting cards
-- [ ] Better text search everywhere
-- [ ] Advanced filtering for cards
-- [ ] Cram feature
-- [ ] Create database on startup
-- [ ] Dark mode (later on once everything is working)
-- [ ] State page
-- [ ] Home page stats
-    - github style stats
-- [ ] Deck info stats, small widgets
-- [ ] Different views for cards
-    - Show and hide certain fields
-    - Grid view
-    - Table view
-    - Sidebar to slide
-- [ ] Templating
-    - possibly through custom templating language
-        - more fun to implement, write a parser and stuff
-    - possibly through drag and drop builder
-        - hard to implement
-        - good way to constrain the flexibility
-    - maybe using custom react components would be best
-        - fully customisable, might be difficult to isolate
-- [] Settings page
-    - change the scheduling algorithm
-    - upload custom scheduling algorithms
-    - provide api keys if needed
-- [ ] Implement states
+See [node.md](./node.md) for current state of the project, and the roadmap.
 
-## Notes
+![Example](./example.png)
 
-learning_state:
-- new
-- learning
-- reviewing
-- due
+## Tech stack
+- TypeScript to power it all
+- React with [electron-vite](https://electron-vite.org/) as the build tool
+- [Shadcn](https://ui.shadcn.com/) for components
+- [Tanstack Query](https://tanstack.com/query/latest) for data fetching
+- [React Router](https://reactrouter.com/) for in memory routing
+- SQLite for local persistence
+- [Drizzle](https://orm.drizzle.team/) for the ORM
+- [Zod](https://zod.dev/) for schema validation
+- [Framer Motion](https://www.framer.com/motion/) for animations
+- [Tabler Icons](https://tabler.io/icons) for the icons
 
-schedule_state:
-- none
-- scheduled
-- due
-- overdue
-
-management_state:
-- active
-- buried
-- flagged
-- archived
+And no, this app wasn't vibe coded.
 

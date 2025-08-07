@@ -29,6 +29,7 @@ if (!rootElement.innerHTML) {
           </MemoryRouter>
           {/* <ReactQueryDevtools initialIsOpen={!true} /> */}
         </TooltipProvider>
+        {/* <ErrorBadge /> */}
       </QueryClientProvider>
     </StrictMode>,
   );

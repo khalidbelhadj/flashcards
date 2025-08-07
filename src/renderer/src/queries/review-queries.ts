@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "src/lib/api-proxy";
+import { Rating } from "src/lib/schema";
 
 export function useCreateReview() {
   const queryClient = useQueryClient();
@@ -12,7 +13,7 @@ export function useCreateReview() {
     }: {
       deckId: string;
       cardId: string;
-      rating: "hard" | "good" | "easy";
+      rating: Rating;
     }) => {
       return await api.reviews.createReview(deckId, cardId, rating);
     },

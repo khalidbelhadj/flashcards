@@ -58,7 +58,7 @@ export type Deck = DecksRow & {
   reviewing: number;
 };
 
-export type DeckWithDepth = Deck & { depth: number };
+export type DeckWithDepth = Deck & { depth: number; childCount: number };
 
 export type Node = Deck & { children: Node[] };
 
@@ -87,7 +87,7 @@ export function flatten(nodes: Node[], expanded: Set<string>) {
   while (stack.length > 0) {
     const current = stack.pop();
     if (current === undefined) throw new Error("Bruh");
-    result.push(current);
+    result.push({ ...current, childCount: current.children.length });
     if (!expanded.has(current.id)) continue;
     for (const child of current.children) {
       stack.push({ ...child, depth: current.depth + 1 });

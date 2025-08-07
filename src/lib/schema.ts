@@ -80,7 +80,7 @@ export const reviewsTable = sqliteTable("reviews", {
     .notNull()
     .references(() => cardsTable.id, { onDelete: "cascade" }),
   rating: text("rating", {
-    enum: ["hard", "good", "easy"],
+    enum: ["forgot", "hard", "good", "easy"],
   }).notNull(),
   createdAt: text("created_at")
     .notNull()
@@ -103,3 +103,4 @@ export const reviewsRelations = relations(reviewsTable, ({ one }) => ({
 export type DecksRow = typeof decksTable.$inferSelect;
 export type CardsRow = typeof cardsTable.$inferSelect;
 export type ReviewsRow = typeof reviewsTable.$inferSelect;
+export type Rating = (typeof reviewsTable.$inferSelect)["rating"];

@@ -133,9 +133,10 @@ export function useMoveDeck() {
     }) => {
       await api.decks.moveDeck(id, parentId);
     },
-    onSettled: async () => {
+    onSettled: async (_, __, { id }) => {
       await queryClient.invalidateQueries({ queryKey: ["decks"] });
       await queryClient.invalidateQueries({ queryKey: ["decks-recursive"] });
+      await queryClient.invalidateQueries({ queryKey: ["path", id] });
     },
   });
 }

@@ -1,11 +1,12 @@
 import { useCards } from "@/queries/card-queries";
 import { useDeck, useDeckPath } from "@/queries/deck-queries";
 import { useCreateReview } from "@/queries/review-queries";
-import { IconArrowLeft, IconCube3dSphere } from "@tabler/icons-react";
+import { IconAlignLeft, IconArrowLeft } from "@tabler/icons-react";
 import { useState } from "react";
 import { NavLink, useParams } from "react-router";
 import { Button } from "./ui/button";
 
+import { CardFooter } from "@/components/card";
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -43,6 +44,19 @@ export function Review() {
 
   const handleNext = () => {
     setCardIdx((prev) => Math.min(prev + 1, cards.length));
+  };
+
+  const handleForgot = async () => {
+    const card = cards[cardIdx];
+    if (card) {
+      await createReview({
+        deckId: id,
+        cardId: card.id,
+        rating: "forgot",
+      });
+    }
+    handleNext();
+    setShow(false);
   };
 
   const handleHard = async () => {
@@ -214,18 +228,34 @@ export function Review() {
         )}
         {cardIdx < cards.length && (
           <>
-            <div className="border rounded-md max-w-lg bg-background">
-              <div className="p-2">{card.front}</div>
-              {show && (
-                <div className="p-2 border-t border-dashed">{card.back}</div>
-              )}
-              <div className="bg-muted/50 border-t p-1 flex items-center justify-between">
-                <Button className="" size="sm" variant="ghost">
-                  <IconCube3dSphere className="size-4" />
-                  Basic
-                </Button>
+            <div className="border rounded-md max-w-lg bg-background overflow-hidden">
+              <div className="p-2 flex flex-col gap-1">
+                <div className="text-xs border rounded-sm w-fit px-1 flex items-center gap-1">
+                  <IconAlignLeft className="size-3" />
+                  Front
+                </div>
+                {card.front.length > 0 ? (
+                  card.front
+                ) : (
+                  <span className="text-muted-foreground">Empty</span>
+                )}
               </div>
+              {show && (
+                <div className="p-2 flex flex-col gap-1  border-t border-dashed ">
+                  <div className="text-xs border rounded-sm w-fit px-1 flex items-center gap-1">
+                    <IconAlignLeft className="size-3" />
+                    Back
+                  </div>
+                  {card.back.length > 0 ? (
+                    card.back
+                  ) : (
+                    <span className="text-muted-foreground">Empty</span>
+                  )}
+                </div>
+              )}
+              <CardFooter card={card} />
             </div>
+
             {/* <div className="bg-background rounded-md border p-2">
               <div>{card.front}</div>
               {show && (
@@ -240,6 +270,7 @@ export function Review() {
                 <div className="flex flex-col gap-1">
                   <Button onClick={() => setShow(false)}>Hide Answer</Button>
                   <div className="flex items-center gap-1">
+                    <Button onClick={handleForgot}>Forgot</Button>
                     <Button onClick={handleHard}>Hard</Button>
                     <Button onClick={handleGood}>Good</Button>
                     <Button onClick={handleEasy}>Easy</Button>

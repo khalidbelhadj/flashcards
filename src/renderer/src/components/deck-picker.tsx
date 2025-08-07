@@ -45,15 +45,17 @@ export function DeckPicker({
         >
           <ProjectIcon className="size-3.5" />
           {path?.at(-1)?.name ?? "Decks"}
-          <IconChevronDown
-            className={cn(
-              "size-4 ml-auto transition-transform",
-              expanded && "rotate-180",
-            )}
-          />
+          {collapsible && (
+            <IconChevronDown
+              className={cn(
+                "size-4 ml-auto transition-transform",
+                expanded && "rotate-180",
+              )}
+            />
+          )}
         </Button>
       </div>
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {(expanded || !collapsible) && (
           <motion.div
             initial={{ height: 0 }}

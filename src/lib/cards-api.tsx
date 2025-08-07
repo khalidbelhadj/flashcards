@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import db from "src/lib/db";
-import { cardsTable } from "src/lib/schema";
+import { cardsTable, reviewsTable } from "src/lib/schema";
 
 export async function getCards(deckId: string | null, filter?: string) {
   if (deckId === null) {
@@ -40,4 +40,46 @@ export async function updateCardLastReview(cardId: string) {
   return cardId;
 }
 
-export default {};
+export async function deleteCard(cardId: string) {
+  await db.delete(cardsTable).where(eq(cardsTable.id, cardId));
+  return cardId;
+}
+
+export async function moveCard(cardId: string, deckId: string) {
+  await db.update(cardsTable).set({ deckId }).where(eq(cardsTable.id, cardId));
+}
+
+class Todo extends Error {
+  constructor(message: string) {
+    super(`TODO: ${message}`);
+  }
+}
+
+export async function resetCardHistory(cardId: string) {
+  await db.transaction(async (tx) => {
+    await tx.delete(reviewsTable).where(eq(reviewsTable.cardId, cardId));
+    await tx
+      .update(cardsTable)
+      .set({ status: "new", lastReview: null })
+      .where(eq(cardsTable.id, cardId));
+  });
+}
+
+export async function duplicateCard(cardId: string) {
+  const card = await db
+    .select()
+    .from(cardsTable)
+    .where(eq(cardsTable.id, cardId))
+    .get();
+  if (!card) throw new Error("Card not found");
+
+  const newCard = await db
+    .insert(cardsTable)
+    .values({
+      deckId: card.deckId,
+      front: card.front,
+      back: card.back,
+    })
+    .returning();
+  return newCard;
+}

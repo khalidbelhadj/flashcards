@@ -1,4 +1,5 @@
 import { Card } from "@/components/card";
+import MoveCardDialog from "@/components/move-card-dialog";
 import NonIdealState from "@/components/non-ideal-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,7 @@ import {
 import { useCards, useCreateCard } from "@/queries/card-queries";
 import {
   IconAlignLeft,
-  IconCube3dSphere,
+  IconCube,
   IconDeviceFloppy,
   IconPlus,
   IconSearch,
@@ -20,9 +21,11 @@ import {
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
+import { CardsRow } from "src/lib/schema";
 
 export default function Cards({ id }: { id: string }) {
   const [showCreateCard, setShowCreateCard] = useState(false);
+  const [moveCard, setMoveCard] = useState<CardsRow | null>(null);
   const [filter, setFilter] = useState("");
   const frontRef = useRef<HTMLTextAreaElement>(null);
   const backRef = useRef<HTMLTextAreaElement>(null);
@@ -51,7 +54,8 @@ export default function Cards({ id }: { id: string }) {
 
   return (
     <main className="w-full bg-background-dark border-t h-full relative">
-      <div className="absolute p-2 w-full">
+      <MoveCardDialog onClose={() => setMoveCard(null)} card={moveCard} />
+      <div className="absolute p-3 w-full z-10">
         {/* Cards header */}
         <div className="flex items-center gap-2">
           <Input
@@ -90,8 +94,8 @@ export default function Cards({ id }: { id: string }) {
         </div>
       </div>
 
-      <div className="w-full h-full overflow-auto pt-12 p-2">
-        <div className="flex flex-col gap-2 mx-auto max-w-lg">
+      <div className="w-full h-full overflow-auto pt-12 p-3">
+        <div className="flex flex-col gap-3 mx-auto max-w-lg">
           {/* Create card */}
           <AnimatePresence>
             {showCreateCard && (
@@ -134,25 +138,29 @@ export default function Cards({ id }: { id: string }) {
                     placeholder="Type here..."
                   />
                 </div>
-                <div className="p-1 flex items-center gap-1 bg-background-dark border-t">
-                  <Button size="sm" variant="ghost" icon={<IconCube3dSphere />}>
-                    Basic
-                  </Button>
+
+                <div className="bg-background-dark border-t p-1 flex items-center gap-1">
                   <Button
                     type="button"
-                    variant="outline"
+                    className="hover:bg-muted gap-1 text-muted-foreground"
+                    size="sm"
+                    variant="ghost"
+                    icon={<IconCube className="size-3.5" />}
+                  >
+                    Basic
+                  </Button>
+
+                  <Button
                     className="ml-auto"
-                    onClick={(e) => {
-                      handleCancel(
-                        e as unknown as React.MouseEvent<HTMLButtonElement>,
-                      );
-                    }}
+                    type="button"
+                    variant="outline"
+                    onClick={handleCancel}
                     icon={<IconX />}
+                    size="sm"
                   >
                     Cancel
                   </Button>
-
-                  <Button type="submit" icon={<IconDeviceFloppy />}>
+                  <Button type="submit" icon={<IconDeviceFloppy />} size="sm">
                     Save
                   </Button>
                 </div>
@@ -163,7 +171,9 @@ export default function Cards({ id }: { id: string }) {
           {/* Cards List */}
           {!isPending &&
             !isError &&
-            cards.map((card) => <Card key={card.id} card={card} />)}
+            cards.map((card) => (
+              <Card key={card.id} card={card} setShowMove={setMoveCard} />
+            ))}
 
           {isPending &&
             Array.from({ length: 5 }).map(() => (
