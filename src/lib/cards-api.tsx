@@ -32,6 +32,14 @@ export async function createCard(deckId: string, front: string, back: string) {
   return deckId;
 }
 
+export async function updateCard(cardId: string, front: string, back: string) {
+  await db
+    .update(cardsTable)
+    .set({ front, back })
+    .where(eq(cardsTable.id, cardId));
+  return cardId;
+}
+
 export async function updateCardLastReview(cardId: string) {
   await db
     .update(cardsTable)
@@ -47,12 +55,6 @@ export async function deleteCard(cardId: string) {
 
 export async function moveCard(cardId: string, deckId: string) {
   await db.update(cardsTable).set({ deckId }).where(eq(cardsTable.id, cardId));
-}
-
-class Todo extends Error {
-  constructor(message: string) {
-    super(`TODO: ${message}`);
-  }
 }
 
 export async function resetCardHistory(cardId: string) {

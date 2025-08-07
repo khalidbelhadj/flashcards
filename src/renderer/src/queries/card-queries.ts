@@ -5,12 +5,12 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { api } from "src/lib/api-proxy";
+import type { CardsRow } from "src/lib/schema";
 
 export function useCards(deckId: string, filter?: string) {
   return useQuery({
     queryKey: ["cards", deckId, filter],
     queryFn: async () => {
-      console.log("refetching cards");
       const cards = await api.cards.getCards(deckId, filter);
       return cards;
     },
@@ -35,10 +35,8 @@ export function useCreateCard() {
     }) => {
       return await api.cards.createCard(deckId, front, back);
     },
-    onSettled: (data) => {
-      if (data) {
-        queryClient.invalidateQueries({ queryKey: ["cards", data] });
-      }
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cards"] });
     },
   });
 }
@@ -49,6 +47,64 @@ export function useDeleteCard() {
     mutationKey: ["deleteCard"],
     mutationFn: async (cardId: string) => {
       return await api.cards.deleteCard(cardId);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cards"] });
+    },
+  });
+}
+
+export function useUpdateCard() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    unknown,
+    unknown,
+    { cardId: string; front: string; back: string },
+    { previousCardsData: Array<[readonly unknown[], CardsRow[] | undefined]> }
+  >({
+    mutationKey: ["updateCard"],
+    mutationFn: async ({
+      cardId,
+      front,
+      back,
+    }: {
+      cardId: string;
+      front: string;
+      back: string;
+    }) => {
+      return await api.cards.updateCard(cardId, front, back);
+    },
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({ queryKey: ["cards"] });
+
+      const previousCardsData = queryClient.getQueriesData<CardsRow[]>({
+        queryKey: ["cards"],
+      });
+
+      previousCardsData.forEach(([key, oldCards]) => {
+        if (!oldCards) return;
+        queryClient.setQueryData<CardsRow[]>(
+          key,
+          oldCards.map((card) =>
+            card.id === variables.cardId
+              ? {
+                  ...card,
+                  front: variables.front,
+                  back: variables.back,
+                  updatedAt: new Date().toISOString(),
+                }
+              : card,
+          ),
+        );
+      });
+
+      return { previousCardsData };
+    },
+    onError: (_err, _variables, context) => {
+      if (!context) return;
+      context.previousCardsData.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["cards"] });

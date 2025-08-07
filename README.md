@@ -2,12 +2,13 @@
 
 Simple flashcards app. The idea is to provide a local [obsidian-like](https://obsidian.md/) experience, with everything being stored locally. There is an emphasis on the user experience being clean and functional, and the app being fast and responsive. Features of this app take inspiration from [Anki](https://apps.ankiweb.net/) and [Mochi](https://mochi.cards/).
 
-See [node.md](./node.md) for current state of the project, and the roadmap.
+See [note.md](./note.md) for current state of the project, and the roadmap.
 
 ![Example](./example.png)
 
 ## Tech stack
 - TypeScript to power it all
+- Tailwind of course
 - React with [electron-vite](https://electron-vite.org/) as the build tool
 - [Shadcn](https://ui.shadcn.com/) for components
 - [Tanstack Query](https://tanstack.com/query/latest) for data fetching

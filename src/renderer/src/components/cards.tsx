@@ -25,6 +25,7 @@ import { CardsRow } from "src/lib/schema";
 
 export default function Cards({ id }: { id: string }) {
   const [showCreateCard, setShowCreateCard] = useState(false);
+  const [editingCardId, setEditingCardId] = useState<string | null>(null);
   const [moveCard, setMoveCard] = useState<CardsRow | null>(null);
   const [filter, setFilter] = useState("");
   const frontRef = useRef<HTMLTextAreaElement>(null);
@@ -85,7 +86,10 @@ export default function Cards({ id }: { id: string }) {
 
           <Button
             variant="outline"
-            onClick={() => setShowCreateCard(true)}
+            onClick={() => {
+              setEditingCardId(null);
+              setShowCreateCard(true);
+            }}
             className="ml-auto"
             icon={<IconPlus />}
           >
@@ -172,7 +176,17 @@ export default function Cards({ id }: { id: string }) {
           {!isPending &&
             !isError &&
             cards.map((card) => (
-              <Card key={card.id} card={card} setShowMove={setMoveCard} />
+              <Card
+                key={card.id}
+                card={card}
+                setShowMove={setMoveCard}
+                isEditing={editingCardId === card.id}
+                onBeginEdit={(cid) => {
+                  setShowCreateCard(false);
+                  setEditingCardId(cid);
+                }}
+                onEndEdit={() => setEditingCardId(null)}
+              />
             ))}
 
           {isPending &&
