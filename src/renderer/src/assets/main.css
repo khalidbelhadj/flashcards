@@ -115,17 +115,12 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    font-family: "Inter", sans-serif;
   }
   body {
     @apply bg-background text-foreground;
   }
-  .font-mono,
-  code,
-  pre,
-  kbd,
-  samp {
-    font-family: "JetBrainsMono NF", monospace;
-  }
+
   button {
     @apply cursor-pointer;
   }

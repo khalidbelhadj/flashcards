@@ -209,7 +209,7 @@ export default function Decks() {
   };
 
   return (
-    <div className="max-w-lg w-full h-fit max-h-full border rounded-md bg-background flex flex-col overflow-hidden">
+    <div className="max-w-lg w-full h-fit max-h-full border rounded-md bg-background flex flex-col overflow-hidden text-base">
       {dialogue && (
         <>
           {dialogue.type === "move" && (
@@ -255,7 +255,7 @@ export default function Decks() {
         onDragLeave={handleHeaderDragLeave}
         onDrop={handleHeaderDrop}
       >
-        <div className="font-medium text-sm text-muted-foreground flex items-center gap-2">
+        <div className="font-medium text-muted-foreground flex items-center gap-2">
           Decks
           {!isPending && !isError && (
             <Tooltip>
@@ -334,7 +334,6 @@ export default function Decks() {
                     dragOverDeck === deck.id &&
                       "bg-blue-100 dark:bg-blue-900/30",
                     isDragging && draggedDeck === deck.id && "cursor-grabbing",
-                    // Disable drop styling for descendants
                     draggedDeck &&
                       descendants.has(deck.id) &&
                       "cursor-not-allowed opacity-50",
@@ -371,7 +370,7 @@ export default function Decks() {
                     />
                   </Button>
 
-                  <div className="flex-1 text-sm">{deck.name}</div>
+                  <div className="flex-1">{deck.name}</div>
                   <DeckDropdown deck={deck} setDialogue={setDialogue}>
                     <Button
                       className="p-1 h-full w-fit ml-auto hover:bg-muted"

@@ -22,12 +22,10 @@ import {
   IconChevronUp,
   IconCopy,
   IconCube,
-  IconDeviceFloppy,
   IconDots,
   IconEdit,
   IconRefresh,
   IconTrash,
-  IconX,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -59,6 +57,7 @@ export function Card({
 
   const frontRef = useRef<HTMLTextAreaElement>(null);
   const backRef = useRef<HTMLTextAreaElement>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // When entering edit mode, focus the front textarea and move caret to end
   useEffect(() => {
@@ -105,7 +104,13 @@ export function Card({
 
   return (
     <div className="border rounded-md max-w-lg bg-background overflow-hidden relative group">
-      <div className="absolute top-2 right-2 flex gap-1 p-0.5 rounded-sm text-muted-foreground bg-background-dark opacity-0 group-hover:opacity-100  transition-opacity duration-150">
+      {/* Hover actions */}
+      <div
+        className={cn(
+          "absolute top-2 right-2 flex gap-1 p-0.5 rounded-sm text-muted-foreground bg-background-dark transition-opacity duration-150 border",
+          isMenuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+        )}
+      >
         <Button
           className="rounded-sm"
           variant="ghost"
@@ -120,7 +125,7 @@ export function Card({
           icon={<IconEdit />}
           onClick={() => (isEditing ? onEndEdit?.() : onBeginEdit?.(card.id))}
         />
-        <DropdownMenu>
+        <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button
               className="rounded-sm"
@@ -214,12 +219,11 @@ export function Card({
               type="button"
               variant="outline"
               onClick={handleCancelEdit}
-              icon={<IconX />}
               size="sm"
             >
               Cancel
             </Button>
-            <Button type="submit" icon={<IconDeviceFloppy />} size="sm">
+            <Button type="submit" size="sm">
               Save
             </Button>
           </div>

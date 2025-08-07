@@ -14,10 +14,8 @@ import { useCards, useCreateCard } from "@/queries/card-queries";
 import {
   IconAlignLeft,
   IconCube,
-  IconDeviceFloppy,
   IconPlus,
   IconSearch,
-  IconX,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
@@ -159,12 +157,11 @@ export default function Cards({ id }: { id: string }) {
                     type="button"
                     variant="outline"
                     onClick={handleCancel}
-                    icon={<IconX />}
                     size="sm"
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" icon={<IconDeviceFloppy />} size="sm">
+                  <Button type="submit" size="sm">
                     Save
                   </Button>
                 </div>

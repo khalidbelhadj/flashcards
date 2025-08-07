@@ -27,6 +27,13 @@
     - maybe using custom react components would be best
         - fully customisable, might be difficult to isolate
 
+- [ ] Keyboard shortcuts
+    - [ ] Review
+    - [ ] Deck management
+    - [ ] Card management
+    - [ ] Page navigation
+    - [ ] Navigating lists
+
 - [ ] Management
     - [ ] Advanced filtering for cards
     - [ ] Sorting cards
