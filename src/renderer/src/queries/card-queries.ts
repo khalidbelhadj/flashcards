@@ -145,6 +145,20 @@ export function useResetCardHistory() {
   });
 }
 
+export function useResetDeckHistory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["resetDeckHistory"],
+    mutationFn: async (deckId: string) => {
+      return await api.cards.resetDeckHistory(deckId);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviews", "card"] });
+      queryClient.invalidateQueries({ queryKey: ["cards"] });
+    },
+  });
+}
+
 export function useDuplicateCard() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -155,5 +169,16 @@ export function useDuplicateCard() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["cards"] });
     },
+  });
+}
+
+export function useDueCards() {
+  return useQuery({
+    queryKey: ["dueCards"],
+    queryFn: async () => {
+      return await api.cards.getDueCards();
+    },
+    refetchInterval: 1 * 1000 * 60, // 1 minute
+    structuralSharing: false,
   });
 }

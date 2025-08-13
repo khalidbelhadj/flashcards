@@ -107,8 +107,9 @@ export function Card({
       {/* Hover actions */}
       <div
         className={cn(
-          "absolute top-2 right-2 flex gap-1 p-0.5 rounded-sm text-muted-foreground bg-background-dark transition-opacity duration-150 border",
+          "absolute top-2 right-2 flex gap-1 p-0.5 rounded-sm text-muted-foreground bg-background transition-opacity duration-150 border",
           isMenuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+          isEditing && "!opacity-0",
         )}
       >
         <Button

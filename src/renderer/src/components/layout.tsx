@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { DeckSearch } from "./deck-search";
 
+Date.now = () => {
+  return new Date("2025-08-08").getTime();
+};
+
 export default function Layout() {
   const [showSearch, setShowSearch] = useState(false);
   const navigate = useNavigate();

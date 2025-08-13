@@ -3,259 +3,482 @@ import { cardsTable, decksTable } from "src/lib/schema";
 import { v4 as uuidv4 } from "uuid";
 
 // Sample deck data with hierarchical structure
-const deckData = [
+const deckData: {
+  name: string;
+  children: { name: string; children: { name: string }[] }[];
+}[] = [
   {
-    name: "Web Development",
+    name: "Operating Systems",
     children: [
-      {
-        name: "Frontend",
-        children: [{ name: "React" }, { name: "CSS" }],
-      },
-      {
-        name: "Backend",
-        children: [{ name: "Node.js" }],
-      },
+      { name: "File Systems", children: [{ name: "Ext4" }] },
+      { name: "Networking", children: [{ name: "TCP/IP" }] },
     ],
   },
   {
-    name: "Life Sciences",
+    name: "Distributed Systems",
     children: [
-      {
-        name: "Biology",
-        children: [{ name: "Cell Biology" }],
-      },
-      {
-        name: "Medicine",
-      },
+      { name: "Consensus", children: [{ name: "Raft" }] },
+      { name: "Fault Tolerance", children: [{ name: "Replication" }] },
+    ],
+  },
+  {
+    name: "Game Theory",
+    children: [
+      { name: "Nash Equilibrium", children: [{ name: "Prisoner's Dilemma" }] },
+      { name: "Auctions", children: [{ name: "Vickrey Auction" }] },
+    ],
+  },
+  {
+    name: "Computer Architecture",
+    children: [
+      { name: "Caches", children: [{ name: "Cache Coherence" }] },
+      { name: "Pipelines", children: [{ name: "Out-of-Order Execution" }] },
     ],
   },
 ];
 
 // Sample cards for different subjects
-const cardTemplates = {
-  "Web Development": [
+const cardTemplates: {
+  [key: string]: { front: string; back: string }[];
+} = {
+  "Operating Systems": [
     {
-      front: "What does HTTP stand for and what problem does it solve?",
-      back: "Hypertext Transfer Protocol; it standardizes how clients and servers communicate on the web using requests and responses.",
+      front: "What is the role of the OS kernel?",
+      back: "Manages hardware resources, provides scheduling, memory management, I/O, and system calls.",
     },
     {
-      front: "What is the difference between HTTP and HTTPS?",
-      back: "HTTPS is HTTP over TLS/SSL, providing encryption, integrity, and authentication.",
+      front: "Process vs thread?",
+      back: "A process has its own address space; threads share a process's address space and resources.",
     },
     {
-      front: "Define REST in the context of web APIs.",
-      back: "Representational State Transfer; an architectural style that uses stateless operations, resources, and standard HTTP methods.",
+      front: "What is a system call?",
+      back: "An API for user-space to request kernel services (e.g., open, read, write, fork).",
     },
     {
-      front: "What is the role of a CDN?",
-      back: "A Content Delivery Network caches and serves assets from edge locations to reduce latency and offload origin servers.",
+      front: "Define virtual memory.",
+      back: "Abstraction mapping virtual to physical addresses with page tables, enabling isolation and demand paging.",
     },
     {
-      front: "What problem does CORS address?",
-      back: "Cross-Origin Resource Sharing controls which origins can access resources across domain boundaries for security.",
-    },
-  ],
-  React: [
-    {
-      front: "What is JSX?",
-      back: "A syntax extension for JavaScript that looks like XML/HTML.",
-    },
-    {
-      front: "What is a component in React?",
-      back: "A reusable, self-contained piece of UI.",
-    },
-    {
-      front: "What is the difference between state and props?",
-      back: "State is managed within the component, while props are passed to the component.",
-    },
-    {
-      front: "What is the virtual DOM?",
-      back: "A lightweight copy of the actual DOM, used by React for performance optimization.",
-    },
-    {
-      front: "What is a hook in React?",
-      back: "A function that lets you 'hook into' React state and lifecycle features from function components.",
-    },
-    {
-      front: "What is `useState` used for?",
-      back: "It is a Hook that lets you add React state to function components.",
+      front: "What is context switching?",
+      back: "Saving/restoring CPU state to switch between threads/processes; incurs cache/TLB overhead.",
     },
   ],
-  Frontend: [
+  "File Systems": [
     {
-      front: "What is the difference between SSR, SSG, and CSR?",
-      back: "SSR renders on the server per request, SSG builds static HTML at build time, CSR renders on the client after JS loads.",
+      front: "What is journaling?",
+      back: "Logging updates before applying to enable crash recovery; can log metadata and/or data.",
     },
     {
-      front: "Why is accessibility (a11y) important on the web?",
-      back: "It ensures content is usable by people with disabilities, improves UX for everyone, and is often a legal requirement.",
+      front: "What is an inode?",
+      back: "Per-file metadata structure with permissions, size, timestamps, and block pointers.",
     },
     {
-      front: "What are web vitals and why do they matter?",
-      back: "Core metrics (e.g., LCP, CLS, INP) that quantify user-perceived performance and impact search ranking and UX.",
+      front: "Hard vs soft link?",
+      back: "Hard links reference the same inode; soft links are path-based and can cross file systems.",
     },
     {
-      front: "Explain bundling vs. code splitting.",
-      back: "Bundling combines modules into a single file; code splitting creates smaller chunks loaded on demand to improve performance.",
+      front: "Directory structure?",
+      back: "Maps names to inode numbers; often stored as B-trees or hashed tables for scalability.",
     },
     {
-      front: "What is hydration?",
-      back: "The process where client-side JS attaches event listeners to server-rendered HTML to make it interactive.",
-    },
-  ],
-  CSS: [
-    {
-      front: "What is the box model?",
-      back: "A model that describes the rectangular boxes that are generated for elements in the document tree.",
-    },
-    {
-      front: "What is Flexbox?",
-      back: "A one-dimensional layout model for arranging items in rows or columns.",
-    },
-    {
-      front: "What is a pseudo-class?",
-      back: "A keyword added to a selector that specifies a special state of the selected element(s).",
-    },
-    {
-      front: "What does 'cascading' in CSS refer to?",
-      back: "The rules that determine how styles are applied when multiple style rules apply to the same element.",
-    },
-    {
-      front: "What is the difference between `em` and `rem` units?",
-      back: "`em` is relative to the font-size of the parent, while `rem` is relative to the font-size of the root element.",
+      front: "What causes fragmentation?",
+      back: "Non-contiguous allocation over time; mitigated by extents and smarter allocators.",
     },
   ],
-  "Node.js": [
+  Ext4: [
     {
-      front: "What is Node.js?",
-      back: "A JavaScript runtime built on Chrome's V8 JavaScript engine.",
-    },
-    { front: "What is NPM?", back: "The default package manager for Node.js." },
-    {
-      front: "What is the event loop in Node.js?",
-      back: "It allows Node.js to perform non-blocking I/O operations.",
+      front: "What are extents in ext4?",
+      back: "Represent contiguous block ranges, reducing metadata overhead and improving performance.",
     },
     {
-      front: "What is a module in Node.js?",
-      back: "A block of code that can be reused throughout an application.",
+      front: "Ext4 journaling modes?",
+      back: "Ordered, writeback, and journal modes, trading performance for stronger consistency.",
     },
     {
-      front: "How do you handle asynchronous operations in Node.js?",
-      back: "Using callbacks, promises, or async/await syntax.",
+      front: "Delayed allocation?",
+      back: "Defers block allocation to improve contiguity and reduce fragmentation.",
     },
     {
-      front: "What is Express.js?",
-      back: "A minimal and flexible Node.js web application framework.",
-    },
-  ],
-  Backend: [
-    {
-      front: "What is horizontal vs. vertical scaling?",
-      back: "Vertical increases resources on a single node; horizontal adds more nodes to distribute load.",
+      front: "HTree directories?",
+      back: "Hash-indexed structure enabling fast lookups in large directories.",
     },
     {
-      front: "Explain idempotency of HTTP methods.",
-      back: "An operation is idempotent if multiple identical requests have the same effect as one (e.g., GET, PUT, DELETE).",
-    },
-    {
-      front: "What is a message queue used for?",
-      back: "Decoupling services and smoothing load by asynchronously processing tasks (e.g., RabbitMQ, SQS, Kafka).",
-    },
-    {
-      front: "Define ACID in databases.",
-      back: "Atomicity, Consistency, Isolation, Durability — guarantees for reliable transactions.",
-    },
-    {
-      front: "Why use connection pooling?",
-      back: "To reuse DB connections, reducing overhead and improving throughput under load.",
+      front: "Timestamp precision?",
+      back: "Nanosecond timestamps with extended epoch handling to avoid Y2038 issues.",
     },
   ],
-  "Cell Biology": [
+  Networking: [
     {
-      front: "What is the function of the mitochondria?",
-      back: "Generates most of the cell's supply of adenosine triphosphate (ATP), used as a source of chemical energy.",
+      front: "OSI vs TCP/IP?",
+      back: "OSI has 7 layers; TCP/IP is 4-5 layers; models help reason about protocols and encapsulation.",
     },
     {
-      front: "What is the nucleus?",
-      back: "A membrane-bound organelle that contains the cell's genetic material.",
+      front: "TCP vs UDP?",
+      back: "TCP is reliable and ordered; UDP is connectionless and best-effort with lower latency.",
     },
     {
-      front: "What is the difference between prokaryotic and eukaryotic cells?",
-      back: "Eukaryotic cells have a nucleus and other membrane-bound organelles, while prokaryotic cells do not.",
+      front: "What is a socket?",
+      back: "Abstraction for network endpoints, identified by IP, port, and protocol.",
     },
     {
-      front: "What is mitosis?",
-      back: "A part of the cell cycle in which replicated chromosomes are separated into two new nuclei.",
+      front: "Congestion control?",
+      back: "Adjust sending rate based on loss/delay (e.g., Reno, CUBIC, BBR).",
     },
     {
-      front: "What is meiosis?",
-      back: "A special type of cell division that reduces the chromosome number by half, creating four haploid cells.",
-    },
-  ],
-  Biology: [
-    {
-      front: "What is the central dogma of molecular biology?",
-      back: "Information flows DNA → RNA → protein via transcription and translation.",
-    },
-    {
-      front: "Define homeostasis.",
-      back: "The tendency of biological systems to maintain stable internal conditions despite external changes.",
-    },
-    {
-      front: "What are the four major classes of biomolecules?",
-      back: "Carbohydrates, lipids, proteins, and nucleic acids.",
-    },
-    {
-      front: "Differentiate genotype and phenotype.",
-      back: "Genotype is the genetic makeup; phenotype is the observable traits resulting from genotype and environment.",
-    },
-    {
-      front: "What is natural selection?",
-      back: "A mechanism of evolution where heritable traits that improve fitness become more common in a population.",
+      front: "What is NAT?",
+      back: "Translates private addresses to public, conserving IPv4 and adding a basic barrier.",
     },
   ],
-  Medicine: [
+  "TCP/IP": [
     {
-      front: "What is a vaccine?",
-      back: "A biological preparation that provides active acquired immunity to a particular infectious disease.",
+      front: "Three-way handshake?",
+      back: "SYN → SYN-ACK → ACK establishes a TCP connection and negotiates options.",
     },
     {
-      front: "What are antibiotics used for?",
-      back: "To treat or prevent some types of bacterial infection.",
+      front: "Sliding window purpose?",
+      back: "Controls in-flight bytes for flow control and pipelining.",
     },
     {
-      front: "What is the Hippocratic Oath?",
-      back: "An oath of ethics historically taken by physicians.",
+      front: "IP fragmentation?",
+      back: "IPv4 may fragment large packets; reassembled at destination. IPv6 avoids router fragmentation.",
     },
     {
-      front: "What is a placebo?",
-      back: "A substance or treatment which is designed to have no therapeutic value.",
+      front: "ARP role?",
+      back: "Resolves IP to MAC on local networks via requests/replies.",
     },
     {
-      front: "What is an MRI?",
-      back: "Magnetic resonance imaging, a medical imaging technique used in radiology to form pictures of the anatomy and the physiological processes of the body.",
+      front: "DNS importance?",
+      back: "Resolves names to IPs via distributed hierarchy and caching; critical for usability.",
     },
   ],
-  "Life Sciences": [
+  "Distributed Systems": [
     {
-      front: "What is the scientific method?",
-      back: "A systematic process: observation, hypothesis, experimentation, analysis, conclusion, and replication.",
+      front: "CAP theorem?",
+      back: "Under partition, must trade consistency vs availability; at most two of CAP.",
     },
     {
-      front: "Define epidemiology.",
-      back: "The study of the distribution and determinants of health-related states in populations.",
+      front: "Eventual consistency?",
+      back: "Replicas converge in absence of new writes; reads may be temporarily stale.",
     },
     {
-      front: "What is a double-blind study?",
-      back: "A study where neither participants nor researchers know who receives the treatment, reducing bias.",
+      front: "What is a quorum?",
+      back: "A majority or configured subset required to proceed, ensuring overlap for safety.",
     },
     {
-      front: "Differentiate correlation and causation.",
-      back: "Correlation is association between variables; causation indicates that one variable produces an effect in another.",
+      front: "Scale up vs out?",
+      back: "Up adds resources to a node; out adds nodes, improving fault tolerance and elasticity.",
     },
     {
-      front: "What is peer review?",
-      back: "Evaluation of scientific work by independent experts to ensure quality and validity before publication.",
+      front: "Distributed transaction?",
+      back: "A multi-node transaction coordinated by 2PC/3PC; trades latency/availability for atomicity.",
+    },
+  ],
+  Consensus: [
+    {
+      front: "What is consensus?",
+      back: "Nodes agree on a value/log despite failures; aims for safety and liveness.",
+    },
+    {
+      front: "Paxos vs Raft?",
+      back: "Both leader-based; Raft emphasizes understandability; Paxos is general but complex.",
+    },
+    {
+      front: "Failure model?",
+      back: "Crash-stop and message delay/loss/reorder; not Byzantine without extensions.",
+    },
+    {
+      front: "Leader election?",
+      back: "Randomized timeouts and votes select a leader to serialize appends.",
+    },
+    {
+      front: "Log replication?",
+      back: "Ensures all correct nodes apply the same ordered operations (state machine replication).",
+    },
+  ],
+  Raft: [
+    {
+      front: "Roles in Raft?",
+      back: "Leader, follower, candidate with timeouts and heartbeats.",
+    },
+    {
+      front: "Raft safety?",
+      back: "Leaders must have up-to-date logs before election; committed entries preserved.",
+    },
+    {
+      front: "Commit rule?",
+      back: "Entry committed after majority replication in leader's term; then applied in order.",
+    },
+    {
+      front: "Log compaction?",
+      back: "Snapshots persist state and truncate logs to bound storage and speed recovery.",
+    },
+    {
+      front: "Config changes?",
+      back: "Joint consensus overlaps old/new configs to change membership safely.",
+    },
+  ],
+  "Fault Tolerance": [
+    {
+      front: "What is fault tolerance?",
+      back: "System continues operating despite failures via redundancy and recovery.",
+    },
+    {
+      front: "Failover?",
+      back: "Automatic switch to standby on failure, coordinated by health checks or consensus.",
+    },
+    {
+      front: "Failure detectors?",
+      back: "Heartbeats/timeouts infer node failure; parameters trade off accuracy/completeness.",
+    },
+    {
+      front: "Circuit breaker?",
+      back: "Stops calling failing services to allow recovery and prevent cascades.",
+    },
+    {
+      front: "How replication helps?",
+      back: "Multiple copies allow continued service during failures; needs consistency control.",
+    },
+  ],
+  Replication: [
+    {
+      front: "Sync vs async replication?",
+      back: "Sync waits for replicas before ack; async acks before replication (risk of loss).",
+    },
+    {
+      front: "Leader-follower?",
+      back: "Leader accepts writes and replicates to followers that can serve reads.",
+    },
+    {
+      front: "Quorum replication?",
+      back: "Overlapping read/write sets ensure consistency with tunable availability.",
+    },
+    {
+      front: "Read-your-writes?",
+      back: "Session guarantee where clients see their own writes after failover/replication.",
+    },
+    {
+      front: "Anti-entropy?",
+      back: "Background reconciliation (Merkle trees) repairs divergent replicas.",
+    },
+  ],
+  "Game Theory": [
+    {
+      front: "What is a game?",
+      back: "Model of strategic interaction with players, strategies, payoffs, and information.",
+    },
+    {
+      front: "Dominant strategy?",
+      back: "Yields payoff at least as good regardless of others; strictly better if strict.",
+    },
+    {
+      front: "Mixed vs pure strategies?",
+      back: "Pure picks one action; mixed randomizes over actions with probabilities.",
+    },
+    {
+      front: "Zero-sum vs non-zero-sum?",
+      back: "Zero-sum gains offset losses; non-zero-sum allows cooperation/coordination.",
+    },
+    {
+      front: "Payoff matrix?",
+      back: "Lists payoffs for action profiles; used to analyze equilibria in finite games.",
+    },
+  ],
+  "Nash Equilibrium": [
+    {
+      front: "Define Nash equilibrium.",
+      back: "No player can unilaterally deviate to improve payoff given others' strategies.",
+    },
+    {
+      front: "Existence in finite games?",
+      back: "Guaranteed in mixed strategies by Nash's theorem; pure may not exist.",
+    },
+    {
+      front: "Best-response dynamics?",
+      back: "Iterative best responses may converge under certain conditions.",
+    },
+    {
+      front: "Multiple equilibria?",
+      back: "Games can have multiple; selection via focal points or risk dominance.",
+    },
+    {
+      front: "Dominant strategy vs Nash?",
+      back: "Dominant is always best; Nash is mutual best responses, not necessarily dominant.",
+    },
+  ],
+  "Prisoner's Dilemma": [
+    {
+      front: "What is the Prisoner's Dilemma?",
+      back: "Defection strictly dominates, yet mutual cooperation is collectively better.",
+    },
+    {
+      front: "Why defect?",
+      back: "Regardless of the other's choice, defecting yields a higher individual payoff.",
+    },
+    {
+      front: "How can cooperation emerge?",
+      back: "In repeated games via strategies like Tit-for-Tat and grim trigger.",
+    },
+    {
+      front: "Role of discount factor?",
+      back: "Higher discounting of future makes cooperation more sustainable.",
+    },
+    {
+      front: "Applications?",
+      back: "Arms races, price wars, environmental agreements, network security.",
+    },
+  ],
+  Auctions: [
+    {
+      front: "Auction types?",
+      back: "First-price, second-price (Vickrey), English, Dutch, combinatorial.",
+    },
+    {
+      front: "Revenue equivalence?",
+      back: "With independent private values and risk neutrality, formats yield same expected revenue.",
+    },
+    {
+      front: "Bid shading?",
+      back: "Reduce bid below value in first-price to balance winning probability and payoff.",
+    },
+    {
+      front: "Collusion risks?",
+      back: "Bidders may coordinate; use reserves and activity rules to deter.",
+    },
+    {
+      front: "Winner's curse?",
+      back: "In common-value auctions, the winner tends to overestimate; bid cautiously.",
+    },
+  ],
+  "Vickrey Auction": [
+    {
+      front: "Define Vickrey auction.",
+      back: "Sealed-bid, second-price; highest bid wins, pays second-highest price.",
+    },
+    {
+      front: "Truthful bidding dominant?",
+      back: "Price paid is independent of your own bid given winning, so bid your value.",
+    },
+    {
+      front: "Revenue equivalence conditions?",
+      back: "Holds under independent private values, symmetry, and risk neutrality.",
+    },
+    {
+      front: "Reserve price purpose?",
+      back: "Avoid selling below value and increase expected revenue.",
+    },
+    {
+      front: "Limitations?",
+      back: "Vulnerable to shill bidding and collusion; requires audits and rules.",
+    },
+  ],
+  "Computer Architecture": [
+    {
+      front: "What is a CPU pipeline?",
+      back: "Stages process different instructions concurrently to increase throughput.",
+    },
+    {
+      front: "Memory hierarchy?",
+      back: "Registers → caches → DRAM → storage; trade latency, capacity, and cost.",
+    },
+    {
+      front: "What is ILP?",
+      back: "Instruction-level parallelism via pipelining, superscalar, and OoO execution.",
+    },
+    {
+      front: "Branch predictor?",
+      back: "Predicts branch outcomes to keep pipelines full; mispredictions flush work.",
+    },
+    {
+      front: "SIMD?",
+      back: "Vector operations (SSE/AVX) accelerate data-parallel workloads.",
+    },
+  ],
+  Caches: [
+    {
+      front: "Why caches?",
+      back: "Bridge CPU-DRAM gap using locality with small, fast memories.",
+    },
+    {
+      front: "Mapping policies?",
+      back: "Direct-mapped, set-associative, fully associative with trade-offs.",
+    },
+    {
+      front: "Types of misses?",
+      back: "Compulsory, capacity, conflict; plus coherence-related in SMPs.",
+    },
+    {
+      front: "Write-through vs write-back?",
+      back: "Through writes memory each time; back defers until eviction.",
+    },
+    {
+      front: "Prefetching?",
+      back: "Speculatively fetch data to hide memory latency (hw/sw).",
+    },
+  ],
+  "Cache Coherence": [
+    {
+      front: "What is coherence?",
+      back: "All processors observe consistent values for shared memory.",
+    },
+    {
+      front: "MESI basics?",
+      back: "Modified, Exclusive, Shared, Invalid states coordinate on bus/directory.",
+    },
+    {
+      front: "Snoop vs directory?",
+      back: "Snoop broadcasts on bus; directory tracks sharers for scalability.",
+    },
+    {
+      front: "False sharing?",
+      back: "Unrelated data in one line causes needless traffic on writes.",
+    },
+    {
+      front: "Consistency vs coherence?",
+      back: "Coherence for single location; consistency orders all memory ops.",
+    },
+  ],
+  Pipelines: [
+    {
+      front: "Pipeline hazards?",
+      back: "Structural, data (RAW/WAR/WAW), control; mitigated by stalls, fwd, renaming.",
+    },
+    {
+      front: "Superscalar exec?",
+      back: "Issue multiple instructions per cycle across units when independent.",
+    },
+    {
+      front: "Out-of-order exec?",
+      back: "Reorder execution, commit in order using ROB and reservation stations.",
+    },
+    {
+      front: "Reorder buffer role?",
+      back: "Holds speculative results for precise exceptions and rollback.",
+    },
+    {
+      front: "Speculation security?",
+      back: "Spectre/Meltdown leak via caches; mitigations include fencing/retpolines.",
+    },
+  ],
+  "Out-of-Order Execution": [
+    {
+      front: "Why register renaming?",
+      back: "Eliminates WAR/WAW by mapping to more physical registers.",
+    },
+    {
+      front: "Tomasulo's algorithm?",
+      back: "Dynamic scheduling with reservation stations and common data bus.",
+    },
+    {
+      front: "Tracking dependencies?",
+      back: "Rename tables and wakeup/select track readiness and schedule issue.",
+    },
+    {
+      front: "What ends speculation?",
+      back: "Commit stage validates results; mispredicts cause pipeline flush.",
+    },
+    {
+      front: "Latency hiding?",
+      back: "Deep pipelines, prefetching, SMT, and larger windows increase overlap.",
     },
   ],
 };

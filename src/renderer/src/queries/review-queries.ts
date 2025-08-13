@@ -18,10 +18,9 @@ export function useCreateReview() {
       return await api.reviews.createReview(deckId, cardId, rating);
     },
     onSuccess: (_, { deckId, cardId }) => {
-      // Invalidate card reviews query to refetch reviews
       queryClient.invalidateQueries({ queryKey: ["reviews", "card", cardId] });
-      // Invalidate cards query to refetch updated lastReview timestamps
       queryClient.invalidateQueries({ queryKey: ["cards", deckId] });
+      queryClient.invalidateQueries({ queryKey: ["dueCards"] });
     },
   });
 }

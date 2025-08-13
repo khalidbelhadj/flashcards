@@ -14,7 +14,6 @@ import { NavLink, useNavigate } from "react-router";
 
 export default function DeckInfo({ id }: { id: string }) {
   const [newDeckOpen, setNewDeckOpen] = useState(false);
-  const [renameOpen, setRenameOpen] = useState(false);
 
   const [dialogue, setDialogue] = useState<DeckDialogue | null>(null);
   const navigate = useNavigate();

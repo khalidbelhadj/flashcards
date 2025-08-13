@@ -1,17 +1,17 @@
 ## Tasks
 
-- [ ] MVP
+- [x] MVP (2025-08-08)
     - [x] Card actions
         - edit
         - delete
         - move
         - reset history
     - [x] Deck actions in deck header
-    - [ ] Editing card content
+    - [x] Editing card content
 
 - [ ] Scheduling logic
-    - [ ] states
-    - [ ] scheduling, trivial algorithm
+    - [x] states
+    - [x] scheduling, trivial algorithm
     - [ ] cram feature, and other manual revision stuff
         - cram
         - learn new cards
@@ -38,6 +38,7 @@
     - [ ] Advanced filtering for cards
     - [ ] Sorting cards
     - [ ] Better text search everywhere
+    - [ ] Bury and suspend cards
 
 - [ ] Publish
     - Create database on startup
@@ -71,23 +72,3 @@
     - mochi
 
 - [ ] AI basics
-
-## Notes
-
-learning_state:
-- new
-- learning
-- reviewing
-- due
-
-schedule_state:
-- none
-- scheduled
-- due
-- overdue
-
-management_state:
-- active
-- buried
-- flagged
-- archived

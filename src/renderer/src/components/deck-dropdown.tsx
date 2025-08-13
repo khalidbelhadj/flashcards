@@ -3,13 +3,17 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Deck } from "@/lib/utils";
+import { useResetDeckHistory } from "@/queries/card-queries";
 import {
   IconArrowsMove,
+  IconCopy,
   IconEdit,
   IconPlus,
+  IconRefresh,
   IconTrash,
 } from "@tabler/icons-react";
 
@@ -44,6 +48,12 @@ export default function DeckDropdown({
   children: React.ReactNode;
   align?: "start" | "end" | "center";
 }) {
+  const { mutateAsync: resetDeckHistory } = useResetDeckHistory();
+
+  const handleResetDeckHistory = async () => {
+    await resetDeckHistory(deck.id);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
@@ -59,12 +69,18 @@ export default function DeckDropdown({
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => {
-              setDialogue({ type: "rename", id: deck.id, name: deck.name });
+              navigator.clipboard.writeText(deck.id);
             }}
           >
-            <IconEdit className="size-icon" />
-            Rename
+            <IconCopy className="size-icon" />
+            Copy ID
           </DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleResetDeckHistory}>
+            <IconRefresh className="size-icon" />
+            Reset history
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+
           <DropdownMenuItem
             onSelect={() => {
               setDialogue({
@@ -76,6 +92,14 @@ export default function DeckDropdown({
           >
             <IconArrowsMove className="size-icon" />
             Move to
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => {
+              setDialogue({ type: "rename", id: deck.id, name: deck.name });
+            }}
+          >
+            <IconEdit className="size-icon" />
+            Rename
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={async () => {

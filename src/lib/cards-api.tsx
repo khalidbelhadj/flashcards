@@ -1,6 +1,10 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, lte } from "drizzle-orm";
 import db from "src/lib/db";
 import { cardsTable, reviewsTable } from "src/lib/schema";
+
+export async function getCard(id: string) {
+  return await db.select().from(cardsTable).where(eq(cardsTable.id, id)).get();
+}
 
 export async function getCards(deckId: string | null, filter?: string) {
   if (deckId === null) {
@@ -62,8 +66,18 @@ export async function resetCardHistory(cardId: string) {
     await tx.delete(reviewsTable).where(eq(reviewsTable.cardId, cardId));
     await tx
       .update(cardsTable)
-      .set({ status: "new", lastReview: null })
+      .set({ status: "new", lastReview: null, n: 0, interval: 0 })
       .where(eq(cardsTable.id, cardId));
+  });
+}
+
+export async function resetDeckHistory(deckId: string) {
+  await db.transaction(async (tx) => {
+    await tx.delete(reviewsTable).where(eq(reviewsTable.deckId, deckId));
+    await tx
+      .update(cardsTable)
+      .set({ status: "new", lastReview: null, n: 0, interval: 0 })
+      .where(eq(cardsTable.deckId, deckId));
   });
 }
 
@@ -84,4 +98,13 @@ export async function duplicateCard(cardId: string) {
     })
     .returning();
   return newCard;
+}
+
+export async function getDueCards() {
+  const dueDate = new Date().toISOString();
+  return await db
+    .select()
+    .from(cardsTable)
+    .where(lte(cardsTable.dueDate, dueDate))
+    .all();
 }

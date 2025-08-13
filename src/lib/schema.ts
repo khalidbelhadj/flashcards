@@ -1,5 +1,10 @@
 import { relations } from "drizzle-orm";
-import { AnySQLiteColumn, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  AnySQLiteColumn,
+  integer,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 import { v4 as uuidv4 } from "uuid";
 
 export const decksTable = sqliteTable("decks", {
@@ -36,6 +41,7 @@ export const decksRelations = relations(decksTable, ({ many, one }) => ({
 }));
 
 export const cardsTable = sqliteTable("cards", {
+  // Data
   id: text("id")
     .primaryKey()
     .notNull()
@@ -46,17 +52,24 @@ export const cardsTable = sqliteTable("cards", {
   front: text("front").notNull(),
   back: text("back").notNull(),
   lastReview: text("last_review"),
+
+  // Scheduling stats
+  interval: integer("interval").notNull().default(0),
+  dueDate: text("due_date").notNull().default(new Date().toISOString()),
+  n: integer("n").notNull().default(0),
+  status: text({
+    enum: ["new", "learning", "reviewing"],
+  })
+    .notNull()
+    .$default(() => "new"),
+
+  // Timestamps
   createdAt: text("created_at")
     .notNull()
     .$default(() => new Date().toISOString()),
   updatedAt: text("updated_at")
     .notNull()
     .$default(() => new Date().toISOString()),
-  status: text({
-    enum: ["new", "learning", "reviewing"],
-  })
-    .notNull()
-    .$default(() => "new"),
 });
 
 export const cardsRelations = relations(cardsTable, ({ one, many }) => ({
@@ -82,6 +95,7 @@ export const reviewsTable = sqliteTable("reviews", {
   rating: text("rating", {
     enum: ["forgot", "hard", "good", "easy"],
   }).notNull(),
+
   createdAt: text("created_at")
     .notNull()
     .$default(() => new Date().toISOString()),
