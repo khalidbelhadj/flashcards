@@ -1,5 +1,11 @@
 ## Tasks
 
+Small things to sort out:
+- [ ] last reviewed display on card doesn't update as time goes on, should refresh every minute
+- [ ] slight shift in height in edit mode of cards
+- [ ] DONT use opacity to change font colour
+- [ ] deleting deck doesn't navigate out
+
 - [x] MVP (2025-08-08)
     - [x] Card actions
         - edit
@@ -38,6 +44,7 @@
     - [ ] Advanced filtering for cards
     - [ ] Sorting cards
     - [ ] Better text search everywhere
+    - [ ] Search in deck picker
     - [ ] Bury and suspend cards
 
 - [ ] Publish

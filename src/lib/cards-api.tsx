@@ -1,4 +1,4 @@
-import { desc, eq, lte } from "drizzle-orm";
+import { and, desc, eq, lte } from "drizzle-orm";
 import db from "src/lib/db";
 import { cardsTable, reviewsTable } from "src/lib/schema";
 
@@ -100,11 +100,16 @@ export async function duplicateCard(cardId: string) {
   return newCard;
 }
 
-export async function getDueCards() {
+export async function getDueCards(deckId: string | null) {
   const dueDate = new Date().toISOString();
   return await db
     .select()
     .from(cardsTable)
-    .where(lte(cardsTable.dueDate, dueDate))
+    .where(
+      and(
+        lte(cardsTable.dueDate, dueDate),
+        deckId ? eq(cardsTable.deckId, deckId) : undefined,
+      ),
+    )
     .all();
 }

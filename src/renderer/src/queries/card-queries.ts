@@ -172,11 +172,11 @@ export function useDuplicateCard() {
   });
 }
 
-export function useDueCards() {
+export function useDueCards(deckId: string | null) {
   return useQuery({
-    queryKey: ["dueCards"],
+    queryKey: ["cards", deckId, "due"],
     queryFn: async () => {
-      return await api.cards.getDueCards();
+      return await api.cards.getDueCards(deckId);
     },
     refetchInterval: 1 * 1000 * 60, // 1 minute
     structuralSharing: false,

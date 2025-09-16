@@ -14,7 +14,6 @@ import {
 import { buildTree, cn, flatten } from "@/lib/utils";
 import { useDecksRecursive, useMoveDeck } from "@/queries/deck-queries";
 import { IconChevronRight, IconDots, IconPlus } from "@tabler/icons-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useRef, useState } from "react";
 import { NavLink } from "react-router";
 
@@ -209,7 +208,7 @@ export default function Decks() {
   };
 
   return (
-    <div className="max-w-lg w-full h-fit max-h-full border rounded-md bg-background flex flex-col overflow-hidden text-base">
+    <div className="max-w-lg w-full h-fit max-h-full border rounded-md bg-background flex flex-col overflow-hidden text-base min-h-20">
       {dialogue && (
         <>
           {dialogue.type === "move" && (
@@ -298,7 +297,7 @@ export default function Decks() {
       {!isPending && !isError && (
         <div
           ref={containerRef}
-          className="flex flex-col overflow-y-auto flex-1 relative"
+          className="flex flex-col overflow-y-auto relative"
           onDragOver={handleContainerDragOver}
           onDrop={handleContainerDrop}
         >
@@ -310,84 +309,70 @@ export default function Decks() {
               />
             </div>
           )}
-          <AnimatePresence initial={false}>
-            {decks.map((deck) => (
-              <motion.div
+          {decks.map((deck) => (
+            <div key={deck.id}>
+              <NavLink
                 key={deck.id}
-                initial={{ height: 0 }}
-                animate={{
-                  height: "auto",
-                }}
-                exit={{
-                  height: 0,
-                }}
-                transition={{ duration: 0.15 }}
-                style={{ overflow: "hidden" }}
+                to={`/decks/${deck.id}`}
+                draggable
+                className={cn(
+                  "flex items-center gap-0.5 p-1 hover:bg-accent font-medium relative group",
+                  draggedDeck === deck.id && "opacity-50",
+                  dragOverDeck === deck.id && "bg-blue-100 dark:bg-blue-900/30",
+                  isDragging && draggedDeck === deck.id && "cursor-grabbing",
+                  draggedDeck &&
+                    descendants.has(deck.id) &&
+                    "cursor-not-allowed opacity-50",
+                )}
+                onDragStart={(e) => handleDragStart(e, deck.id)}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => handleDragOver(e, deck.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, deck.id)}
               >
-                <NavLink
-                  key={deck.id}
-                  to={`/decks/${deck.id}`}
-                  draggable
-                  className={cn(
-                    "flex items-center gap-0.5 p-1 hover:bg-accent font-medium relative group",
-                    draggedDeck === deck.id && "opacity-50",
-                    dragOverDeck === deck.id &&
-                      "bg-blue-100 dark:bg-blue-900/30",
-                    isDragging && draggedDeck === deck.id && "cursor-grabbing",
-                    draggedDeck &&
-                      descendants.has(deck.id) &&
-                      "cursor-not-allowed opacity-50",
-                  )}
-                  onDragStart={(e) => handleDragStart(e, deck.id)}
-                  onDragEnd={handleDragEnd}
-                  onDragOver={(e) => handleDragOver(e, deck.id)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleDrop(e, deck.id)}
+                {Array.from({ length: deck.depth }).map(() => (
+                  <div className="w-6"></div>
+                ))}
+                <Button
+                  className="hover:bg-muted !p-0"
+                  size="icon-sm"
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (deck.childCount === 0) return;
+                    toggleExpanded(deck.id);
+                  }}
                 >
-                  {Array.from({ length: deck.depth }).map(() => (
-                    <div className="w-6"></div>
-                  ))}
+                  <ProjectIcon className="size-icon group-hover:hidden" />
+                  <IconChevronRight
+                    className={cn(
+                      "size-icon hidden group-hover:inline-block transition-transform",
+                      deck.childCount === 0 && "text-muted-foreground",
+                      expanded.has(deck.id) &&
+                        deck.childCount > 0 &&
+                        "rotate-90",
+                    )}
+                  />
+                </Button>
+
+                <div className="flex-1">{deck.name}</div>
+                <DeckDropdown deck={deck} setDialogue={setDialogue}>
                   <Button
-                    className="hover:bg-muted !p-0"
-                    size="icon-sm"
+                    className="p-1 h-full w-fit ml-auto hover:bg-muted"
                     variant="ghost"
+                    size="icon"
                     onClick={(e) => {
-                      e.preventDefault();
                       e.stopPropagation();
-                      if (deck.childCount === 0) return;
-                      toggleExpanded(deck.id);
+                      e.preventDefault();
                     }}
                   >
-                    <ProjectIcon className="size-icon group-hover:hidden" />
-                    <IconChevronRight
-                      className={cn(
-                        "size-icon hidden group-hover:inline-block transition-transform",
-                        deck.childCount === 0 && "text-muted-foreground",
-                        expanded.has(deck.id) &&
-                          deck.childCount > 0 &&
-                          "rotate-90",
-                      )}
-                    />
+                    <IconDots className="size-icon" />
                   </Button>
-
-                  <div className="flex-1">{deck.name}</div>
-                  <DeckDropdown deck={deck} setDialogue={setDialogue}>
-                    <Button
-                      className="p-1 h-full w-fit ml-auto hover:bg-muted"
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                      }}
-                    >
-                      <IconDots className="size-icon" />
-                    </Button>
-                  </DeckDropdown>
-                </NavLink>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                </DeckDropdown>
+              </NavLink>
+            </div>
+          ))}
         </div>
       )}
     </div>

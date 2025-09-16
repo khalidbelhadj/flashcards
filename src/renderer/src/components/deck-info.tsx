@@ -4,19 +4,47 @@ import MoveDeckDialog from "@/components/move-deck-dialog";
 import NewDeckDialog from "@/components/new-deck-dialog";
 import ProjectIcon from "@/components/project-icon";
 import RenameDeckDialogue from "@/components/rename-deck-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, formatNumber } from "@/lib/utils";
+import { useDueCards } from "@/queries/card-queries";
 import { useDeck, useDecks, useSetLastReviewed } from "@/queries/deck-queries";
 import { IconCircleDashed, IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 
+function ReviewButton({ id }: { id: string }) {
+  const navigate = useNavigate();
+  const { data: due } = useDueCards(id);
+
+  const { mutateAsync: setLastReviewed } = useSetLastReviewed(id);
+
+  const handleReview = async () => {
+    await setLastReviewed(new Date());
+    navigate(`/decks/${id}/review`);
+  };
+
+  return (
+    <div className="flex items-center flex-nowrap">
+      <Button
+        variant="default"
+        onClick={handleReview}
+        icon={<IconCircleDashed />}
+      >
+        Review
+        <Badge className="py-0 !text-xs px-1 rounded-[4.5px] bg-[hsl(214,81%,66%)]">
+          {formatNumber(due?.length ?? 0)}
+        </Badge>
+      </Button>
+    </div>
+  );
+}
+
 export default function DeckInfo({ id }: { id: string }) {
   const [newDeckOpen, setNewDeckOpen] = useState(false);
 
   const [dialogue, setDialogue] = useState<DeckDialogue | null>(null);
-  const navigate = useNavigate();
 
   const {
     data: deck,
@@ -28,12 +56,6 @@ export default function DeckInfo({ id }: { id: string }) {
     isPending: isSubdecksPending,
     isError: isSubdecksError,
   } = useDecks(id);
-  const { mutateAsync: setLastReviewed } = useSetLastReviewed(id);
-
-  const handleReview = async () => {
-    await setLastReviewed(new Date());
-    navigate(`/decks/${id}/review`);
-  };
 
   return (
     <div className="flex flex-col gap-3 bg-background z-10">
@@ -114,14 +136,7 @@ export default function DeckInfo({ id }: { id: string }) {
               >
                 New deck
               </Button>
-              <Button
-                className=""
-                variant="default"
-                onClick={handleReview}
-                icon={<IconCircleDashed />}
-              >
-                Review
-              </Button>
+              <ReviewButton id={id} />
             </div>
           </div>
 

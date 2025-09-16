@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
  * @param date
  * @returns
  */
-export function formatDate(date: Date) {
+export function formatDate(date: Date, capitalize = true) {
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const minutes = Math.floor(diff / (1000 * 60));
@@ -38,7 +38,7 @@ export function formatDate(date: Date) {
   if (minutes > 0) {
     return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
   }
-  return "Just now";
+  return capitalize ? "Just now" : "just now";
 }
 
 /**

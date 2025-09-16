@@ -7,6 +7,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn, formatDate } from "@/lib/utils";
 import {
   useDeleteCard,
@@ -109,7 +114,7 @@ export function Card({
         className={cn(
           "absolute top-2 right-2 flex gap-1 p-0.5 rounded-sm text-muted-foreground bg-background transition-opacity duration-150 border",
           isMenuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100",
-          isEditing && "!opacity-0",
+          isEditing && "hidden",
         )}
       >
         <Button
@@ -291,32 +296,58 @@ export function CardFooter({ card }: CardFooterProps) {
   return (
     <>
       <div className="bg-background-dark border-t p-1 flex items-center justify-between">
-        <Button
-          className="hover:bg-muted gap-1 text-muted-foreground"
-          size="sm"
-          variant="ghost"
-          icon={<IconCube className="size-3.5" />}
-        >
-          Basic
-        </Button>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              className="hover:bg-muted gap-1 text-muted-foreground"
+              size="sm"
+              variant="ghost"
+              icon={<IconCube className="size-3.5" />}
+            >
+              Basic
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <div>
+              <div> This card uses the Basic template </div>
+              <div className="text-muted-foreground">
+                Click to edit the template
+              </div>
+            </div>
+          </TooltipContent>
+        </Tooltip>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          // TODO: review this
-          className="flex items-center gap-1 text-xs hover:bg-muted text-muted-foreground"
-          disabled={isLoading}
-          onClick={() => setIsExpanded((p) => !p)}
-        >
-          {getButtonText()}
-          {reviews &&
-            reviews.length > 0 &&
-            (isExpanded ? (
-              <IconChevronUp className="size-3" />
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              variant="ghost"
+              size="sm"
+              // TODO: review this
+              className="flex items-center gap-1 text-xs hover:bg-muted text-muted-foreground"
+              disabled={isLoading}
+              onClick={() => setIsExpanded((p) => !p)}
+            >
+              {getButtonText()}
+              {reviews &&
+                reviews.length > 0 &&
+                (isExpanded ? (
+                  <IconChevronUp className="size-3" />
+                ) : (
+                  <IconChevronDown className="size-3" />
+                ))}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {reviews && reviews.length > 0 && card.lastReview ? (
+              <div>
+                Last reviewed{" "}
+                {formatDate(new Date(card.lastReview || ""), false)}
+              </div>
             ) : (
-              <IconChevronDown className="size-3" />
-            ))}
-        </Button>
+              <div>This card has no reviews</div>
+            )}
+          </TooltipContent>
+        </Tooltip>
       </div>
       <AnimatePresence>
         {isExpanded && reviews && reviews.length > 0 && (

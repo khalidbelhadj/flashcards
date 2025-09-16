@@ -1,4 +1,4 @@
-import { useCards } from "@/queries/card-queries";
+import { useDueCards } from "@/queries/card-queries";
 import { useDeck, useDeckPath } from "@/queries/deck-queries";
 import { useCreateReview } from "@/queries/review-queries";
 import { IconAlignLeft, IconArrowLeft } from "@tabler/icons-react";
@@ -33,21 +33,21 @@ export function Review() {
 
   const { data: deck } = useDeck(id);
 
-  const { data: cards } = useCards(id);
+  const { data: due } = useDueCards(id);
   const { data: path, isPending, isError } = useDeckPath(id);
 
   const { mutateAsync: createReview } = useCreateReview();
 
-  if (deck === undefined || cards === undefined) {
+  if (deck === undefined || due === undefined) {
     return <div>Loading...</div>;
   }
 
   const handleNext = () => {
-    setCardIdx((prev) => Math.min(prev + 1, cards.length));
+    setCardIdx((prev) => Math.min(prev + 1, due.length));
   };
 
   const handleForgot = async () => {
-    const card = cards[cardIdx];
+    const card = due[cardIdx];
     if (card) {
       await createReview({
         deckId: id,
@@ -60,7 +60,7 @@ export function Review() {
   };
 
   const handleHard = async () => {
-    const card = cards[cardIdx];
+    const card = due[cardIdx];
     if (card) {
       await createReview({
         deckId: id,
@@ -73,7 +73,7 @@ export function Review() {
   };
 
   const handleGood = async () => {
-    const card = cards[cardIdx];
+    const card = due[cardIdx];
     if (card) {
       await createReview({
         deckId: id,
@@ -86,7 +86,7 @@ export function Review() {
   };
 
   const handleEasy = async () => {
-    const card = cards[cardIdx];
+    const card = due[cardIdx];
     if (card) {
       await createReview({
         deckId: id,
@@ -98,7 +98,7 @@ export function Review() {
     setShow(false);
   };
 
-  const card = cards[cardIdx];
+  const card = due[cardIdx];
 
   return (
     <div className="w-full h-full relative">
@@ -177,13 +177,16 @@ export function Review() {
         </Breadcrumb>
       </header>
 
-      {cards.length > 0 && (
-        <div className="flex items-center justify-center p-4">
+      {due.length > 0 && (
+        <div className="flex items-center justify-center p-4 flex-col">
+          <div className="text-muted-foreground">
+            {cardIdx + 1} / {due.length}
+          </div>
           <div className="w-96 bg-neutral-200 border border-neutral-300 h-5 rounded-full overflow-clip">
             <div
               className="bg-success h-full transition-all ease-in-out duration-300"
               style={{
-                width: `${(cardIdx / cards.length) * 100}%`,
+                width: `${(cardIdx / due.length) * 100}%`,
               }}
             ></div>
           </div>
@@ -216,7 +219,7 @@ export function Review() {
       </div> */}
 
       <main className="w-lg mx-auto pt-16 px-5 ">
-        {cardIdx >= cards.length && (
+        {cardIdx >= due.length && (
           <div className="flex flex-col items-center">
             <div className="text-muted-foreground text-center p-4">
               No cards to review
@@ -226,7 +229,7 @@ export function Review() {
             </Button>
           </div>
         )}
-        {cardIdx < cards.length && (
+        {cardIdx < due.length && (
           <>
             <div className="border rounded-md max-w-lg bg-background overflow-hidden">
               <div className="p-2 flex flex-col gap-1">

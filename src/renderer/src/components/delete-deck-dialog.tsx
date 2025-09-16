@@ -34,7 +34,7 @@ export default function DeleteDeckDialog({
             <IconX className="size-4" />
           </Button>
         </DialogHeader>
-        <div className="p-4 text-sm text-muted-foreground">
+        <div className="p-2 text-sm text-muted-foreground">
           Are you sure you want to delete this deck? This action cannot be
           undone.
         </div>

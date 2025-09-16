@@ -1,0 +1,36 @@
+[
+  {
+    "name": "Operating Systems",
+    "children": [
+      { "name": "File Systems", "children": [{ "name": "Ext4" }] },
+      { "name": "Networking", "children": [{ "name": "TCP/IP" }] }
+    ]
+  },
+  {
+    "name": "Distributed Systems",
+    "children": [
+      { "name": "Consensus", "children": [{ "name": "Raft" }] },
+      { "name": "Fault Tolerance", "children": [{ "name": "Replication" }] }
+    ]
+  },
+  {
+    "name": "Game Theory",
+    "children": [
+      {
+        "name": "Nash Equilibrium",
+        "children": [{ "name": "Prisoner's Dilemma" }]
+      },
+      { "name": "Auctions", "children": [{ "name": "Vickrey Auction" }] }
+    ]
+  },
+  {
+    "name": "Computer Architecture",
+    "children": [
+      { "name": "Caches", "children": [{ "name": "Cache Coherence" }] },
+      {
+        "name": "Pipelines",
+        "children": [{ "name": "Out-of-Order Execution" }]
+      }
+    ]
+  }
+]

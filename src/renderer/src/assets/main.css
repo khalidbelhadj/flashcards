@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.5rem;
+  --radius: 0.4rem;
   --icon-sm: calc(var(--spacing) * 3);
   --icon: calc(var(--spacing) * 4);
   --icon-lg: calc(var(--spacing) * 5);
