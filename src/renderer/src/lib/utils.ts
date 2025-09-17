@@ -1,4 +1,6 @@
+import { QueryClient } from "@tanstack/react-query";
 import { clsx, type ClassValue } from "clsx";
+import { api } from "src/lib/api-proxy";
 import { DecksRow } from "src/lib/schema";
 import { twMerge } from "tailwind-merge";
 
@@ -95,4 +97,23 @@ export function flatten(nodes: Node[], expanded: Set<string>) {
   }
 
   return result;
+}
+
+export function prefetchDeck(id: string, queryClient: QueryClient) {
+  queryClient.prefetchQuery({
+    queryKey: ["deck", id],
+    queryFn: async () => await api.decks.getById(id),
+  });
+  queryClient.prefetchQuery({
+    queryKey: ["decks", id],
+    queryFn: async () => await api.decks.getDecks(id),
+  });
+  queryClient.prefetchQuery({
+    queryKey: ["path", id],
+    queryFn: async () => await api.decks.getPathTo(id),
+  });
+  queryClient.prefetchQuery({
+    queryKey: ["cards", id],
+    queryFn: async () => await api.cards.getCards(id),
+  });
 }

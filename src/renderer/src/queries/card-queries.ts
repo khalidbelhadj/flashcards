@@ -11,8 +11,7 @@ export function useCards(deckId: string, filter?: string) {
   return useQuery({
     queryKey: ["cards", deckId, filter],
     queryFn: async () => {
-      const cards = await api.cards.getCards(deckId, filter);
-      return cards;
+      return await api.cards.getCards(deckId, filter);
     },
     placeholderData: keepPreviousData,
     refetchInterval: 1 * 1000 * 60, // 1 minute

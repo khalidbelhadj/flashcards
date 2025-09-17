@@ -39,6 +39,7 @@ export function Review() {
   const { mutateAsync: createReview } = useCreateReview();
 
   if (deck === undefined || due === undefined) {
+    // TODO: @loading
     return <div>Loading...</div>;
   }
 

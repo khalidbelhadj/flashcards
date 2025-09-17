@@ -285,6 +285,7 @@ export function CardFooter({ card }: CardFooterProps) {
   };
 
   const getButtonText = () => {
+    // TODO: @loading
     if (isLoading) return "Loading...";
     if (!reviews || reviews.length === 0) return "No reviews";
     if (card.lastReview) {

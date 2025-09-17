@@ -1,17 +1,18 @@
-import DeckDropdown, { DeckDialogue } from "@/components/deck-dropdown";
-import DeleteDeckDialog from "@/components/delete-deck-dialog";
-import MoveDeckDialog from "@/components/move-deck-dialog";
-import NewDeckDialog from "@/components/new-deck-dialog";
 import ProjectIcon from "@/components/project-icon";
-import RenameDeckDialogue from "@/components/rename-deck-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, formatDate, formatNumber } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useDeckDialogue } from "@/contexts/deck-dialogue-context";
+import { cn, formatDate, formatNumber, prefetchDeck } from "@/lib/utils";
 import { useDueCards } from "@/queries/card-queries";
 import { useDeck, useDecks, useSetLastReviewed } from "@/queries/deck-queries";
 import { IconCircleDashed, IconPlus } from "@tabler/icons-react";
-import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { NavLink, useNavigate } from "react-router";
 
 function ReviewButton({ id }: { id: string }) {
@@ -42,9 +43,8 @@ function ReviewButton({ id }: { id: string }) {
 }
 
 export default function DeckInfo({ id }: { id: string }) {
-  const [newDeckOpen, setNewDeckOpen] = useState(false);
-
-  const [dialogue, setDialogue] = useState<DeckDialogue | null>(null);
+  const queryClient = useQueryClient();
+  const { openDialogue } = useDeckDialogue();
 
   const {
     data: deck,
@@ -64,55 +64,10 @@ export default function DeckInfo({ id }: { id: string }) {
           <div className="flex items-center gap-2">
             {/* Title */}
             {!isDeckPending && !isDeckError && (
-              <>
-                {dialogue && (
-                  <>
-                    {dialogue.type === "move" && (
-                      <MoveDeckDialog
-                        open={dialogue.type === "move"}
-                        onClose={() => setDialogue(null)}
-                        id={dialogue.id}
-                        parentId={dialogue.parentId}
-                      />
-                    )}
-                    {dialogue.type === "rename" && (
-                      <RenameDeckDialogue
-                        open={dialogue.type === "rename"}
-                        onClose={() => setDialogue(null)}
-                        id={dialogue.id}
-                        name={dialogue.name}
-                      />
-                    )}
-                    {dialogue.type === "new" && (
-                      <NewDeckDialog
-                        id={dialogue.id}
-                        open={dialogue.type === "new"}
-                        onClose={() => setDialogue(null)}
-                      />
-                    )}
-                    {dialogue.type === "delete" && (
-                      <DeleteDeckDialog
-                        id={dialogue.id}
-                        open={dialogue.type === "delete"}
-                        onClose={() => setDialogue(null)}
-                      />
-                    )}
-                  </>
-                )}
-                <DeckDropdown
-                  deck={deck}
-                  setDialogue={setDialogue}
-                  align="start"
-                >
-                  <Button
-                    variant="ghost"
-                    className="text-base font-medium !p-0 text-foreground gap-1 hover:bg-background hover:text-muted-foreground transition-colors"
-                    icon={<ProjectIcon />}
-                  >
-                    {deck.name}
-                  </Button>
-                </DeckDropdown>
-              </>
+              <div className="flex items-center gap-1">
+                <ProjectIcon className="size-4" />
+                <div className="font-semibold text-md">{deck.name}</div>
+              </div>
             )}
 
             {isDeckPending && <Skeleton className="h-7 w-36" />}
@@ -124,14 +79,9 @@ export default function DeckInfo({ id }: { id: string }) {
 
             {/* Actions */}
             <div className="flex items-center gap-2 ml-auto">
-              <NewDeckDialog
-                id={id}
-                open={newDeckOpen}
-                onClose={() => setNewDeckOpen(false)}
-              />
               <Button
                 variant="outline"
-                onClick={() => setNewDeckOpen(true)}
+                onClick={() => openDialogue({ type: "new", id })}
                 icon={<IconPlus />}
               >
                 New deck
@@ -170,15 +120,22 @@ export default function DeckInfo({ id }: { id: string }) {
             {!isSubdecksPending &&
               !isSubdecksError &&
               subDecks?.map((deck) => (
-                <NavLink
-                  to={`/decks/${deck.id}`}
-                  className="min-w-32 w-32 px-2 h-7 bg-background border rounded-md font-medium flex items-center gap-1 hover:bg-accent"
-                >
-                  <div className="size-4">
-                    <ProjectIcon className="size-3.5" />
-                  </div>
-                  <div className="truncate text-sm">{deck.name}</div>
-                </NavLink>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <NavLink
+                      to={`/decks/${deck.id}`}
+                      className="min-w-32 w-32 px-2 h-7 bg-background border rounded-md font-medium flex items-center gap-1 hover:bg-accent"
+                      prefetch="intent"
+                      onMouseOver={() => prefetchDeck(deck.id, queryClient)}
+                    >
+                      <div className="size-4">
+                        <ProjectIcon className="size-3.5" />
+                      </div>
+                      <div className="truncate text-sm">{deck.name}</div>
+                    </NavLink>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">{deck.name}</TooltipContent>
+                </Tooltip>
               ))}
           </div>
         </div>

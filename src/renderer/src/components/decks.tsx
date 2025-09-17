@@ -1,24 +1,23 @@
-import DeckDropdown, { DeckDialogue } from "@/components/deck-dropdown";
-import DeleteDeckDialog from "@/components/delete-deck-dialog";
-import MoveDeckDialog from "@/components/move-deck-dialog";
-import NewDeckDialog from "@/components/new-deck-dialog";
+import DeckDropdown from "@/components/deck-dropdown";
 import NonIdealState from "@/components/non-ideal-state";
 import ProjectIcon from "@/components/project-icon";
-import RenameDeckDialogue from "@/components/rename-deck-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { buildTree, cn, flatten } from "@/lib/utils";
+import { useDeckDialogue } from "@/contexts/deck-dialogue-context";
+import { buildTree, cn, flatten, prefetchDeck } from "@/lib/utils";
 import { useDecksRecursive, useMoveDeck } from "@/queries/deck-queries";
 import { IconChevronRight, IconDots, IconPlus } from "@tabler/icons-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { NavLink } from "react-router";
 
 export default function Decks() {
-  const [dialogue, setDialogue] = useState<DeckDialogue | null>(null);
+  const queryClient = useQueryClient();
+  const { openDialogue } = useDeckDialogue();
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     const value = localStorage.getItem("expanded");
     if (value === null) return new Set();
@@ -209,41 +208,6 @@ export default function Decks() {
 
   return (
     <div className="max-w-lg w-full h-fit max-h-full border rounded-md bg-background flex flex-col overflow-hidden text-base min-h-20">
-      {dialogue && (
-        <>
-          {dialogue.type === "move" && (
-            <MoveDeckDialog
-              open={dialogue.type === "move"}
-              onClose={() => setDialogue(null)}
-              id={dialogue.id}
-              parentId={dialogue.parentId}
-            />
-          )}
-          {dialogue.type === "rename" && (
-            <RenameDeckDialogue
-              open={dialogue.type === "rename"}
-              onClose={() => setDialogue(null)}
-              id={dialogue.id}
-              name={dialogue.name}
-            />
-          )}
-          {dialogue.type === "new" && (
-            <NewDeckDialog
-              id={dialogue.id}
-              open={dialogue.type === "new"}
-              onClose={() => setDialogue(null)}
-            />
-          )}
-          {dialogue.type === "delete" && (
-            <DeleteDeckDialog
-              id={dialogue.id}
-              open={dialogue.type === "delete"}
-              onClose={() => setDialogue(null)}
-            />
-          )}
-        </>
-      )}
-
       {/* Header */}
       <div
         className={cn(
@@ -274,7 +238,7 @@ export default function Decks() {
               size="icon-sm"
               variant="ghost"
               onClick={() => {
-                setDialogue({ type: "new", id: null });
+                openDialogue({ type: "new", id: null });
               }}
               icon={<IconPlus className="text-muted-foreground" />}
             />
@@ -285,7 +249,9 @@ export default function Decks() {
 
       {/* Decks list */}
       {isPending && (
-        <div className="px-2 py-1 text-muted-foreground text-sm">Loading</div>
+        <div className="px-2 py-1 text-muted-foreground text-sm">
+          {/* TODO: @loading */}
+        </div>
       )}
 
       {isError && (
@@ -329,6 +295,7 @@ export default function Decks() {
                 onDragOver={(e) => handleDragOver(e, deck.id)}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, deck.id)}
+                onMouseOver={() => prefetchDeck(deck.id, queryClient)}
               >
                 {Array.from({ length: deck.depth }).map(() => (
                   <div className="w-6"></div>
@@ -357,7 +324,7 @@ export default function Decks() {
                 </Button>
 
                 <div className="flex-1">{deck.name}</div>
-                <DeckDropdown deck={deck} setDialogue={setDialogue}>
+                <DeckDropdown deck={deck}>
                   <Button
                     className="p-1 h-full w-fit ml-auto hover:bg-muted"
                     variant="ghost"

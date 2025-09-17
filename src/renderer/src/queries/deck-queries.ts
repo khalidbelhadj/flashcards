@@ -5,8 +5,7 @@ export function useDecks(parentId: string | null) {
   return useQuery({
     queryKey: ["decks", parentId],
     queryFn: async () => {
-      const decks = await api.decks.getDecks(parentId);
-      return decks;
+      return await api.decks.getDecks(parentId);
     },
   });
 }
@@ -15,8 +14,7 @@ export function useDecksRecursive(parentId: string | null) {
   return useQuery({
     queryKey: ["decks-recursive", parentId],
     queryFn: async () => {
-      const decks = await api.decks.getDecksRecursive(parentId);
-      return decks;
+      return await api.decks.getDecksRecursive(parentId);
     },
   });
 }
@@ -25,8 +23,7 @@ export function useDeck(id: string) {
   return useQuery({
     queryKey: ["deck", id],
     queryFn: async () => {
-      const deck = await api.decks.getById(id);
-      return deck;
+      return await api.decks.getById(id);
     },
   });
 }
@@ -56,8 +53,7 @@ export function useDeckPath(id: string | null) {
     queryKey: ["path", id],
     queryFn: async () => {
       if (id === null) return [];
-      const path = await api.decks.getPathTo(id);
-      return path;
+      return await api.decks.getPathTo(id);
     },
   });
 }
@@ -114,8 +110,7 @@ export function useAllDecks() {
   return useQuery({
     queryKey: ["decks", "all"],
     queryFn: async () => {
-      const decks = await api.decks.getDecksRecursive(null);
-      return decks;
+      return await api.decks.getDecksRecursive(null);
     },
   });
 }

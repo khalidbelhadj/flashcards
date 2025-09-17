@@ -9,3 +9,4 @@ out
 build
 *.sqlite
 drizzle
+database.*
