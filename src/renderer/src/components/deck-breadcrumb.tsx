@@ -13,6 +13,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { prefetchDeck } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import { NavLink } from "react-router";
 import { DecksRow } from "src/lib/schema";
 
@@ -68,6 +70,7 @@ function DeckBreadcrumbItem({
   deck: DecksRow;
   deckId: string;
 }) {
+  const queryClient = useQueryClient();
   return (
     <>
       <BreadcrumbSeparator />
@@ -76,7 +79,7 @@ function DeckBreadcrumbItem({
           <NavLink to={`/decks/${deck.id}`}>{deck.name}</NavLink>
         </BreadcrumbPage>
       ) : (
-        <BreadcrumbItem>
+        <BreadcrumbItem onMouseOver={() => prefetchDeck(deckId, queryClient)}>
           <NavLink to={`/decks/${deck.id}`}>{deck.name}</NavLink>
         </BreadcrumbItem>
       )}
