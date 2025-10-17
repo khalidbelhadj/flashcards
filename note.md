@@ -5,6 +5,7 @@ Small things to sort out:
 - [ ] slight shift in height in edit mode of cards
 - [ ] DONT use opacity to change font colour
 - [ ] deleting deck doesn't navigate out
+- [ ] Should we add an alias feature?
 
 - [x] MVP (2025-08-08)
     - [x] Card actions
@@ -14,6 +15,9 @@ Small things to sort out:
         - reset history
     - [x] Deck actions in deck header
     - [x] Editing card content
+
+- [ ] Usability
+    - [ ]
 
 - [ ] Scheduling logic
     - [x] states

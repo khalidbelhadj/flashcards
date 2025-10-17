@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,6 +5,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
@@ -32,7 +36,6 @@ import {
   IconRefresh,
   IconTrash,
 } from "@tabler/icons-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import type { CardsRow } from "src/lib/schema";
 
@@ -108,7 +111,7 @@ export function Card({
   };
 
   return (
-    <div className="border rounded-md max-w-lg bg-background overflow-hidden relative group">
+    <div className="border rounded-md max-w-lg bg-background overflow-hidden relative group h-full flex flex-col">
       {/* Hover actions */}
       <div
         className={cn(
@@ -236,7 +239,7 @@ export function Card({
         </form>
       ) : (
         <>
-          <div className="p-2 flex flex-col gap-1">
+          <div className="p-2 flex flex-col gap-1 grow">
             <div className="text-xs border rounded-sm w-fit px-1 flex items-center gap-1">
               <IconAlignLeft className="size-3" />
               Front
@@ -249,7 +252,7 @@ export function Card({
               <span className="text-muted-foreground">Empty</span>
             )}
           </div>
-          <div className="p-2 flex flex-col gap-1  border-t border-dashed ">
+          <div className="p-2 flex flex-col gap-1  border-t border-dashed grow">
             <div className="text-xs border rounded-sm w-fit px-1 flex items-center gap-1">
               <IconAlignLeft className="size-3" />
               Back
@@ -268,8 +271,14 @@ export function Card({
 }
 
 export function CardFooter({ card }: CardFooterProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [open, setOpen] = useState(false);
   const { data: reviews, isLoading } = useCardReviews(card.id);
+
+  const handleOpen = (newOpen: boolean) => {
+    if (reviews && reviews.length > 0) {
+      setOpen(newOpen);
+    }
+  };
 
   const getRatingColor = (rating: string) => {
     switch (rating) {
@@ -318,25 +327,58 @@ export function CardFooter({ card }: CardFooterProps) {
           </TooltipContent>
         </Tooltip>
 
-        <Tooltip>
+        <Tooltip open={open ? false : undefined}>
           <TooltipTrigger>
-            <Button
-              variant="ghost"
-              size="sm"
-              // TODO: review this
-              className="flex items-center gap-1 text-xs hover:bg-muted text-muted-foreground"
-              disabled={isLoading}
-              onClick={() => setIsExpanded((p) => !p)}
-            >
-              {getButtonText()}
-              {reviews &&
-                reviews.length > 0 &&
-                (isExpanded ? (
-                  <IconChevronUp className="size-3" />
-                ) : (
-                  <IconChevronDown className="size-3" />
-                ))}
-            </Button>
+            <Popover open={open} onOpenChange={handleOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-1 text-xs hover:bg-muted text-muted-foreground"
+                  disabled={isLoading}
+                  onClick={() => handleOpen(!open)}
+                >
+                  {getButtonText()}
+                  {reviews &&
+                    reviews.length > 0 &&
+                    (open ? (
+                      <IconChevronUp className="size-3" />
+                    ) : (
+                      <IconChevronDown className="size-3" />
+                    ))}
+                </Button>
+              </PopoverTrigger>
+
+              <PopoverContent
+                className="p-2 text-xs w-auto flex flex-col gap-1"
+                align="end"
+              >
+                {reviews &&
+                  reviews.map((review, i) => (
+                    <div className="flex gap-1">
+                      <div className="flex flex-col items-center gap-1">
+                        <div
+                          className={cn(
+                            "size-4 bg-muted rounded-full",
+                            review.rating === "hard" && "bg-red-100",
+                            review.rating === "good" && "bg-amber-100",
+                            review.rating === "easy" && "bg-green-100",
+                          )}
+                        />
+                        {i !== reviews.length - 1 && (
+                          <div className="w-1 h-7 bg-muted rounded-[4px]" />
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <div className="text-sm">{review.rating}</div>
+                        <div className="text-muted-foreground text-xs">
+                          {formatDate(new Date(review.createdAt))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </PopoverContent>
+            </Popover>
           </TooltipTrigger>
           <TooltipContent>
             {reviews && reviews.length > 0 && card.lastReview ? (
@@ -350,48 +392,6 @@ export function CardFooter({ card }: CardFooterProps) {
           </TooltipContent>
         </Tooltip>
       </div>
-      <AnimatePresence>
-        {isExpanded && reviews && reviews.length > 0 && (
-          <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            transition={{ duration: 0.15 }}
-          >
-            {/* <div className="text-xs font-medium mb-2">Review History</div> */}
-            <div className="space-y-1 max-h-32 overflow-y-auto p-2 border-t">
-              {reviews
-                .sort(
-                  (a, b) =>
-                    new Date(b.createdAt).getTime() -
-                    new Date(a.createdAt).getTime(),
-                )
-                .map((review) => (
-                  <div
-                    key={review.id}
-                    className="flex items-center gap-2 text-xs"
-                  >
-                    <Badge
-                      variant="secondary"
-                      className={cn(
-                        getRatingColor(review.rating),
-                        "px-1 py-0 rounded-sm",
-                      )}
-                    >
-                      {review.rating}
-                    </Badge>
-                    <span className="text-muted-foreground">
-                      {new Date(review.createdAt).toLocaleDateString()}
-                    </span>
-                    <span className="text-muted-foreground ml-auto">
-                      {formatDate(new Date(review.createdAt))}
-                    </span>
-                  </div>
-                ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

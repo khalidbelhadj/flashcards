@@ -29,6 +29,7 @@ function ReviewButton({ id }: { id: string }) {
   return (
     <div className="flex items-center flex-nowrap">
       <Button
+        className="shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_1px_2px_rgba(0,0,0,0.1)]"
         variant="default"
         onClick={handleReview}
         icon={<IconCircleDashed />}
@@ -58,8 +59,8 @@ export default function DeckInfo({ id }: { id: string }) {
   } = useDecks(id);
 
   return (
-    <div className="flex flex-col gap-3 bg-background z-10">
-      <div className="w-full px-5 mx-auto">
+    <div className="flex flex-col gap-3 bg-background z-10 shadow-[0px_2px_3px_rgba(0,0,0,0.05)]">
+      <div className="w-full p-5 mx-auto flex flex-col gap-3 py-0">
         <div>
           <div className="flex items-center gap-2">
             {/* Title */}
@@ -103,14 +104,14 @@ export default function DeckInfo({ id }: { id: string }) {
         {/* Subdecks list */}
         <div
           className={cn(
-            "w-full h-fit flex flex-col gap-2 pt-3 pb-5",
-            subDecks?.length === 0 && "pt-0",
+            "w-full h-fit flex flex-col gap-2",
+            subDecks?.length !== 0 && "pb-5",
           )}
         >
           <div className="flex items-center gap-2 overflow-auto">
             {isSubdecksPending &&
               Array.from({ length: 3 }).map((_) => (
-                <Skeleton className="min-w-32 w-32 px-2 h-7 rounded-md font-medium flex items-center gap-1"></Skeleton>
+                <Skeleton className="min-w-36 w-36 px-2 h-7 rounded-md font-medium flex items-center gap-1"></Skeleton>
               ))}
             {isSubdecksError && (
               <div className="text-sm text-destructive font-medium">
@@ -124,7 +125,7 @@ export default function DeckInfo({ id }: { id: string }) {
                   <TooltipTrigger>
                     <NavLink
                       to={`/decks/${deck.id}`}
-                      className="min-w-32 w-32 px-2 h-7 bg-background border rounded-md font-medium flex items-center gap-1 hover:bg-accent"
+                      className="min-w-36 w-36 px-2 h-7 bg-background border rounded-md font-medium flex items-center gap-1 hover:bg-accent"
                       prefetch="intent"
                       onMouseOver={() => prefetchDeck(deck.id, queryClient)}
                     >

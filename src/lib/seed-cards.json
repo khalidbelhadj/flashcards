@@ -349,9 +349,7 @@
     {
       "front": "SIMD?",
       "back": "Vector operations (SSE/AVX) accelerate data-parallel workloads."
-    }
-  ],
-  "Caches": [
+    },
     {
       "front": "Why caches?",
       "back": "Bridge CPU-DRAM gap using locality with small, fast memories."
@@ -371,9 +369,7 @@
     {
       "front": "Prefetching?",
       "back": "Speculatively fetch data to hide memory latency (hw/sw)."
-    }
-  ],
-  "Cache Coherence": [
+    },
     {
       "front": "What is coherence?",
       "back": "All processors observe consistent values for shared memory."
@@ -393,9 +389,7 @@
     {
       "front": "Consistency vs coherence?",
       "back": "Coherence for single location; consistency orders all memory ops."
-    }
-  ],
-  "Pipelines": [
+    },
     {
       "front": "Pipeline hazards?",
       "back": "Structural, data (RAW/WAR/WAW), control; mitigated by stalls, fwd, renaming."
@@ -415,9 +409,7 @@
     {
       "front": "Speculation security?",
       "back": "Spectre/Meltdown leak via caches; mitigations include fencing/retpolines."
-    }
-  ],
-  "Out-of-Order Execution": [
+    },
     {
       "front": "Why register renaming?",
       "back": "Eliminates WAR/WAW by mapping to more physical registers."

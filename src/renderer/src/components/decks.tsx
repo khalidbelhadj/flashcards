@@ -297,8 +297,8 @@ export default function Decks() {
                 onDrop={(e) => handleDrop(e, deck.id)}
                 onMouseOver={() => prefetchDeck(deck.id, queryClient)}
               >
-                {Array.from({ length: deck.depth }).map(() => (
-                  <div className="w-6"></div>
+                {Array.from({ length: deck.depth }).map((_, i) => (
+                  <div className="w-6" key={i}></div>
                 ))}
                 <Button
                   className="hover:bg-muted !p-0"

@@ -42,11 +42,32 @@ const createWindow = (): void => {
   }
 };
 
+const createConfirmWindow = (): void => {
+  const confirmWindow = new BrowserWindow({
+    width: 400,
+    height: 200,
+    // titleBarStyle: "hidden",
+    modal: true,
+    parent: BrowserWindow.getFocusedWindow() || undefined,
+    webPreferences: {
+      preload: join(__dirname, "../preload/index.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  confirmWindow.loadFile(join(__dirname, "../renderer/confirm.html"));
+};
+
 app.whenReady().then(() => {
   electronApp.setAppUserModelId("com.flashcards");
 
   app.on("browser-window-created", (_, window) => {
     optimizer.watchWindowShortcuts(window);
+  });
+
+  ipcMain.on("open-confirm-window", () => {
+    createConfirmWindow();
   });
 
   registerApis();

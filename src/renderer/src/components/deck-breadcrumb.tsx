@@ -79,7 +79,7 @@ function DeckBreadcrumbItem({
           <NavLink to={`/decks/${deck.id}`}>{deck.name}</NavLink>
         </BreadcrumbPage>
       ) : (
-        <BreadcrumbItem onMouseOver={() => prefetchDeck(deckId, queryClient)}>
+        <BreadcrumbItem onMouseOver={() => prefetchDeck(deck.id, queryClient)}>
           <NavLink to={`/decks/${deck.id}`}>{deck.name}</NavLink>
         </BreadcrumbItem>
       )}

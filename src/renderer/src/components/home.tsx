@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useDueCards } from "@/queries/card-queries";
 import Decks from "./decks";
 export default function Home() {
@@ -5,6 +6,13 @@ export default function Home() {
 
   return (
     <div className="w-full h-full flex flex-col items-center py-14 px-3 gap-10 overflow-clip max-h-screen min-h-0">
+      <Button
+        onClick={() => {
+          window.electron.ipcRenderer.send("open-confirm-window");
+        }}
+      >
+        Delete
+      </Button>
       <Decks />
     </div>
   );

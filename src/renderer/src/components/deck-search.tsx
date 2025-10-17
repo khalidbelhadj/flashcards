@@ -86,6 +86,7 @@ export function DeckSearch({ open, onOpenChange }: DeckSearchProps) {
       open={open}
       onOpenChange={onOpenChange}
       showCloseButton={false}
+      className="top-0 translate-y-2/3"
     >
       <Command className="" shouldFilter={false}>
         <CommandInput

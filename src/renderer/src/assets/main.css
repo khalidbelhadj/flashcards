@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.4rem;
+  --radius: 0.5rem;
   --icon-sm: calc(var(--spacing) * 3);
   --icon: calc(var(--spacing) * 4);
   --icon-lg: calc(var(--spacing) * 5);
@@ -15,39 +15,43 @@
   --background-darker: #f3f3f5;
 
   /* Text colors */
-  --foreground: #262626;
+  --foreground: hsl(214, 0%, 25%);
 
   /* Brand colors */
-  --primary: hsl(214, 81%, 56%);
-  --primary-foreground: #ffffff;
+  --primary: hsl(214, 80%, 56%);
+  --primary-foreground: hsl(214, 0%, 95%);
   --secondary: hsl(214, 0%, 90%);
-  --secondary-foreground: #4e4e4e;
+  --secondary-foreground: hsl(214, 0%, 40%);
   --muted: hsl(214, 0%, 93%);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: hsl(214, 0%, 40%);
   --accent: hsl(214, 0%, 97%);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent-foreground: hsl(214, 0%, 40%);
 
   /* Supporting colors */
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --success: #61d484;
-  --success-foreground: #ffffff;
-  --warning: #ffa500;
-  --warning-foreground: #ffffff;
-  --info: #0000ff;
-  --info-foreground: #ffffff;
-  --error: #ff0000;
+  --destructive: hsl(360deg, 80.9%, 59%);
+  --destructive-background: hsl(0deg, 85.7%, 97.3%);
+  --destructive-foreground: hsl(360deg, 80.9%, 95%);
+  --destructive-foreground-dark: hsl(360deg, 80.9%, 15%);
+
+  --success: hsl(142deg, 69.6%, 43.9%);
+  --success-background: hsl(143deg, 88.9%, 96.5%);
+  --success-foreground: hsl(142deg, 69.6%, 95%);
+  --success-foreground-dark: hsl(142deg, 69.6%, 15%);
+
+  --warning: hsl(45.6deg, 94.1%, 46.9%);
+  --warning-background: hsl(54.5deg, 91.7%, 95.3%);
+  --warning-foreground: hsl(45.6deg, 94.1%, 95%);
+  --warning-foreground-dark: hsl(45.6deg, 94.1%, 15%);
+
+  --info: hsl(217deg, 80%, 56.9%);
+  --info-background: hsl(212deg, 100%, 96.7%);
+  --info-foreground: hsl(217deg, 80%, 95%);
+  --info-foreground-dark: hsl(217deg, 80%, 15%);
 
   /* Borders */
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: var(--primary);
-
-  /* Cards and popovers */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
 
   /* Charts */
   --chart-1: oklch(0.646 0.222 41.116);
@@ -67,6 +71,43 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+.dark {
+  /* scrollbar-gutter: stable; */
+  color-scheme: dark;
+  /* Backgrounds */
+  --background: hsl(214, 0%, 9%);
+  --background-dark: hsl(214, 0%, 7%);
+  --background-darker: hsl(214, 0%, 3%);
+
+  /* Text colors */
+  --foreground: hsl(214, 0%, 90%);
+
+  /* Brand colors */
+  --primary: hsl(214, 81%, 56%);
+  --primary-foreground: #ffffff;
+  --secondary: hsl(214, 0%, 90%);
+  --secondary-foreground: #4e4e4e;
+  --muted: hsl(214, 0%, 12%);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: hsl(214, 0%, 15%);
+  --accent-foreground: oklch(0.556 0 0);
+
+  /* Supporting colors */
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --success: #61d484;
+  --success-foreground: #ffffff;
+  --warning: #ffa500;
+  --warning-foreground: #ffffff;
+  --info: #0000ff;
+  --info-foreground: #ffffff;
+
+  /* Borders */
+  --border: hsl(0deg, 0%, 14.1%);
+  --input: var(--border);
+  --ring: var(--primary);
+}
+
 @theme inline {
   --size-icon-sm: var(--icon-sm);
   --size-icon: var(--icon);
@@ -75,10 +116,6 @@
   --color-background-dark: var(--background-dark);
   --color-background-darker: var(--background-darker);
   --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -88,7 +125,17 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-background: var(--destructive-background);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-background: var(--success-background);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-background: var(--warning-background);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-background: var(--info-background);
+  --color-info-foreground: var(--info-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

@@ -62,6 +62,12 @@ function Layout() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey && e.key === "d") {
+        e.preventDefault();
+        document.documentElement.classList.toggle("dark");
+        return;
+      }
+
       if (e.metaKey && e.key === "u") {
         e.preventDefault();
         navigate("/ui");
@@ -70,7 +76,7 @@ function Layout() {
 
       if (e.metaKey && e.key === "p") {
         e.preventDefault();
-        setShowSearch(true);
+        setShowSearch((prev) => !prev);
         return;
       }
 
