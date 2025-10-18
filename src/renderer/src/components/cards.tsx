@@ -46,7 +46,7 @@ export default function Cards({ id }: { id: string }) {
         <div className="flex items-center gap-2">
           <Input
             icon={<IconSearch className="size-4" />}
-            className="bg-background !h-7 w-52 rounded-full shadow-[inset_0_1px_2px_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
+            className="bg-background !h-7 w-52 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
             placeholder="Search"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -129,7 +129,7 @@ export default function Cards({ id }: { id: string }) {
         </div>
       </div>
 
-      <div className="w-full h-full overflow-auto pt-12 p-3 cards">
+      <div className="w-full h-full overflow-auto pt-14 p-3 cards">
         {/* No cards message */}
         {!showCreateCard && cards?.length === 0 && (
           <NonIdealState
