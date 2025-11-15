@@ -99,7 +99,7 @@ export function flatten(nodes: Node[], expanded: Set<string>) {
   return result;
 }
 
-export function prefetchDeck(id: string, queryClient: QueryClient) {
+export async function prefetchDeck(id: string, queryClient: QueryClient) {
   queryClient.prefetchQuery({
     queryKey: ["deck", id],
     queryFn: async () => await api.decks.getById(id),
@@ -116,4 +116,11 @@ export function prefetchDeck(id: string, queryClient: QueryClient) {
     queryKey: ["cards", id],
     queryFn: async () => await api.cards.getCards(id),
   });
+}
+
+export async function prefetchAllDecks(queryClient: QueryClient) {
+  const decks = await api.decks.getDecksRecursive(null);
+  for (const deck of decks) {
+    await prefetchDeck(deck.id, queryClient);
+  }
 }

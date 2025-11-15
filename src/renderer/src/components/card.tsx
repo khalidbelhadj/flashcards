@@ -111,11 +111,11 @@ export function Card({
   };
 
   return (
-    <div className="border rounded-md max-w-lg bg-background overflow-hidden relative group h-full flex flex-col">
+    <div className="border rounded-md max-w-xl bg-background overflow-hidden relative group h-full flex flex-col">
       {/* Hover actions */}
       <div
         className={cn(
-          "absolute top-2 right-2 flex gap-1 p-0.5 rounded-sm text-muted-foreground bg-background transition-opacity duration-150 border",
+          "absolute top-2 right-2 flex gap-1 p-0.5 rounded-sm bg-background transition-opacity border",
           isMenuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100",
           isEditing && "hidden",
         )}
@@ -181,7 +181,7 @@ export function Card({
               );
             }
           }}
-          className="max-w-lg bg-background"
+          className="bg-background"
           onSubmit={handleSaveEdit}
         >
           <div className="p-2 flex flex-col gap-1">
@@ -240,8 +240,7 @@ export function Card({
       ) : (
         <>
           <div className="p-2 flex flex-col gap-1 grow">
-            <div className="text-xs border rounded-sm w-fit px-1 flex items-center gap-1">
-              <IconAlignLeft className="size-3" />
+            <div className="text-xs rounded-sm w-fit px-1.5 flex items-center gap-1 bg-muted text-muted-foreground font-medium">
               Front
             </div>
             {card.front.length > 0 ? (
@@ -253,8 +252,7 @@ export function Card({
             )}
           </div>
           <div className="p-2 flex flex-col gap-1  border-t border-dashed grow">
-            <div className="text-xs border rounded-sm w-fit px-1 flex items-center gap-1">
-              <IconAlignLeft className="size-3" />
+            <div className="text-xs rounded-sm w-fit px-1.5 flex items-center gap-1 bg-muted text-muted-foreground font-medium">
               Back
             </div>
             {card.back.length > 0 ? (
@@ -263,7 +261,7 @@ export function Card({
               <span className="text-muted-foreground">Empty</span>
             )}
           </div>
-          <CardFooter card={card} />
+          {/* <CardFooter card={card} /> */}
         </>
       )}
     </div>

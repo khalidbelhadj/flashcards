@@ -67,7 +67,7 @@ export function DeckPicker({
             <Input
               icon={<IconSearch className="size-4" />}
               placeholder="Search"
-              className="rounded-b-none border-none !ring-0 !outline-0 !border-0"
+              className="rounded-b-none border-none !ring-0 !outline-0 !border-0 shadow-none"
               autoFocus
             />
             <Breadcrumb className="p-1 bg-background-dark border-b border-t">

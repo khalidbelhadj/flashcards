@@ -59,7 +59,6 @@ export default function DeckDropdown({
             <IconRefresh className="size-icon" />
             Reset history
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
 
           <DropdownMenuItem
             onSelect={() => {
@@ -81,12 +80,14 @@ export default function DeckDropdown({
             <IconEdit className="size-icon" />
             Rename
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
+            variant="destructive"
             onSelect={async () => {
               openDialogue({ type: "delete", id: deck.id });
             }}
           >
-            <IconTrash className="size-icon" />
+            <IconTrash className="size-icon text-destructive" />
             Delete
           </DropdownMenuItem>
         </DropdownMenuGroup>

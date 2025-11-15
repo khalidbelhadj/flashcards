@@ -59,7 +59,7 @@ export default function DeckInfo({ id }: { id: string }) {
   } = useDecks(id);
 
   return (
-    <div className="flex flex-col gap-3 bg-background z-10 shadow-[0px_2px_3px_rgba(0,0,0,0.05)]">
+    <div className="flex flex-col gap-3 bg-background z-10 shadow-[0px_2px_3px_rgba(0,0,0,0.05)] dark:shadow-[0px_2px_3px_rgba(255,255,255,0.05)]">
       <div className="w-full p-5 mx-auto flex flex-col gap-3 py-0">
         <div>
           <div className="flex items-center gap-2">
@@ -93,11 +93,27 @@ export default function DeckInfo({ id }: { id: string }) {
 
           {/* Last reviewd */}
           {!isDeckPending && !isDeckError && (
-            <div className="text-xs text-muted-foreground">
-              {deck.lastReview === null
-                ? "No reviews yet"
-                : `Last reviewed ${formatDate(new Date(deck.lastReview)).toLowerCase()}`}
-            </div>
+            <Tooltip open={deck.lastReview === null ? false : undefined}>
+              <TooltipTrigger>
+                <div className="text-xs text-muted-foreground">
+                  {deck.lastReview === null
+                    ? "No reviews yet"
+                    : `Last reviewed ${formatDate(new Date(deck.lastReview)).toLowerCase()}`}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="start">
+                {deck.lastReview === null
+                  ? "No reviews yet"
+                  : new Date(deck.lastReview).toLocaleDateString("en-US", {
+                      weekday: "short",
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
 

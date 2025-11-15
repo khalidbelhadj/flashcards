@@ -18,7 +18,10 @@ export default function DeckHeader({ id }: { id: string }) {
   }
 
   return (
-    <header className="flex items-center p-3 gap-2 bg-background justify-center relative">
+    <header
+      className="flex items-center p-3 gap-2 bg-background justify-center relative"
+      id="desktop-header"
+    >
       {/* <div className="absolute left-20 flex items-center">
         <Button variant="ghost" size="icon-sm" asChild>
           <IconArrowLeft className="text-muted-foreground size-icon-lg" />

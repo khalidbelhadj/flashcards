@@ -46,7 +46,7 @@ export default function Cards({ id }: { id: string }) {
         <div className="flex items-center gap-2">
           <Input
             icon={<IconSearch className="size-4" />}
-            className="bg-background !h-7 w-52 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
+            className="bg-background !h-7 w-52 rounded-full"
             placeholder="Search"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -142,7 +142,7 @@ export default function Cards({ id }: { id: string }) {
           />
         )}
         {view === "grid" && (
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-3 w-full mx-auto justify-center items-center">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-3 w-full mx-auto justify-center items-center">
             {!isPending &&
               !isError &&
               cards.map((card) => (
