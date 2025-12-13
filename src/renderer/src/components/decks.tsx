@@ -8,16 +8,178 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useDeckDialogue } from "@/contexts/deck-dialogue-context";
-import { buildTree, cn, flatten, prefetchDeck } from "@/lib/utils";
+import {
+  buildTree,
+  cn,
+  Deck,
+  DeckWithDepth,
+  flatten,
+  prefetchDeck,
+} from "@/lib/utils";
 import { useDecksRecursive, useMoveDeck } from "@/queries/deck-queries";
 import { IconChevronRight, IconDots, IconPlus } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { NavLink } from "react-router";
 
+interface DecksHeaderProps {
+  isPending: boolean;
+  isError: boolean;
+  allDecks: Deck[];
+  dragOverHeader: boolean;
+  onDragOver: (e: React.DragEvent) => void;
+  onDragLeave: (e: React.DragEvent) => void;
+  onDrop: (e: React.DragEvent) => void;
+}
+
+function DecksHeader({
+  isPending,
+  isError,
+  allDecks,
+  dragOverHeader,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+}: DecksHeaderProps) {
+  const { openDialogue } = useDeckDialogue();
+
+  return (
+    <div
+      className={cn(
+        "px-2 py-1 pr-1 gap-1 border-b flex items-center justify-between transition-colors",
+        dragOverHeader && "bg-blue-100 dark:bg-blue-900/30",
+      )}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+    >
+      <div className="font-medium text-muted-foreground flex items-center gap-2">
+        Decks
+        {!isPending && !isError && (
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="bg-muted w-fit px-1 rounded-sm text-xs">
+                {allDecks.length}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>{allDecks.length} decks</TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            className="ml-auto"
+            size="icon-sm"
+            variant="ghost"
+            onClick={() => {
+              openDialogue({ type: "new", id: null });
+            }}
+            icon={<IconPlus className="text-muted-foreground" />}
+          />
+        </TooltipTrigger>
+        <TooltipContent>Create a new deck</TooltipContent>
+      </Tooltip>
+    </div>
+  );
+}
+
+interface DeckRowProps {
+  deck: DeckWithDepth;
+  expanded: Set<string>;
+  draggedDeck: string | null;
+  dragOverDeck: string | null;
+  isDragging: boolean;
+  descendants: Set<string>;
+  onDragStart: (e: React.DragEvent, deckId: string) => void;
+  onDragEnd: () => void;
+  onDragOver: (e: React.DragEvent, deckId: string) => void;
+  onDragLeave: (e: React.DragEvent) => void;
+  onDrop: (e: React.DragEvent, deckId: string) => void;
+  onToggleExpanded: (id: string) => void;
+}
+
+function DeckRow({
+  deck,
+  expanded,
+  draggedDeck,
+  dragOverDeck,
+  isDragging,
+  descendants,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  onToggleExpanded,
+}: DeckRowProps) {
+  const queryClient = useQueryClient();
+  return (
+    <NavLink
+      key={deck.id}
+      to={`/decks/${deck.id}`}
+      draggable
+      className={cn(
+        "flex items-center gap-0.5 p-1 hover:bg-accent font-medium relative group",
+        draggedDeck === deck.id && "opacity-50",
+        dragOverDeck === deck.id && "bg-blue-100 dark:bg-blue-900/30",
+        isDragging && draggedDeck === deck.id && "cursor-grabbing",
+        draggedDeck &&
+          descendants.has(deck.id) &&
+          "cursor-not-allowed opacity-50",
+      )}
+      onDragStart={(e) => onDragStart(e, deck.id)}
+      onDragEnd={onDragEnd}
+      onDragOver={(e) => onDragOver(e, deck.id)}
+      onDragLeave={onDragLeave}
+      onDrop={(e) => onDrop(e, deck.id)}
+      onMouseOver={() => prefetchDeck(deck.id, queryClient)}
+    >
+      {Array.from({ length: deck.depth }).map((_, i) => (
+        <div className="w-6" key={i}></div>
+      ))}
+      <Button
+        className="hover:bg-muted !p-0"
+        size="icon-sm"
+        variant="ghost"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (deck.childCount === 0) return;
+          onToggleExpanded(deck.id);
+        }}
+      >
+        <ProjectIcon className="size-icon group-hover:hidden" />
+        <IconChevronRight
+          className={cn(
+            "size-icon hidden group-hover:inline-block transition-transform",
+            deck.childCount === 0 && "text-muted-foreground",
+            expanded.has(deck.id) && deck.childCount > 0 && "rotate-90",
+          )}
+        />
+      </Button>
+
+      <div className="flex-1">{deck.name}</div>
+      <div>{deck.cardCount}</div>
+      <DeckDropdown deck={deck}>
+        <Button
+          className="p-1 h-full w-fit ml-auto hover:bg-muted"
+          variant="ghost"
+          size="icon"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        >
+          <IconDots className="size-icon" />
+        </Button>
+      </DeckDropdown>
+    </NavLink>
+  );
+}
+
 export default function Decks() {
   const queryClient = useQueryClient();
-  const { openDialogue } = useDeckDialogue();
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     const value = localStorage.getItem("expanded");
     if (value === null) return new Set();
@@ -40,7 +202,7 @@ export default function Decks() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const descendants = useMemo(() => {
-    if (!draggedDeck) return new Set();
+    if (!draggedDeck) return new Set<string>();
     const result = new Set<string>();
     const stack = [draggedDeck];
     while (stack.length > 0) {
@@ -208,44 +370,15 @@ export default function Decks() {
 
   return (
     <div className="max-w-lg w-full h-fit max-h-full border rounded-md bg-background flex flex-col overflow-hidden text-base min-h-20">
-      {/* Header */}
-      <div
-        className={cn(
-          "px-2 py-1 pr-1 gap-1 border-b flex items-center justify-between transition-colors",
-          dragOverHeader && "bg-blue-100 dark:bg-blue-900/30",
-        )}
+      <DecksHeader
+        isPending={isPending}
+        isError={isError}
+        allDecks={allDecks || []}
+        dragOverHeader={dragOverHeader}
         onDragOver={handleHeaderDragOver}
         onDragLeave={handleHeaderDragLeave}
         onDrop={handleHeaderDrop}
-      >
-        <div className="font-medium text-muted-foreground flex items-center gap-2">
-          Decks
-          {!isPending && !isError && (
-            <Tooltip>
-              <TooltipTrigger>
-                <div className="bg-muted w-fit px-1 rounded-sm text-xs">
-                  {allDecks.length}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>{allDecks.length} decks</TooltipContent>
-            </Tooltip>
-          )}
-        </div>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className="ml-auto"
-              size="icon-sm"
-              variant="ghost"
-              onClick={() => {
-                openDialogue({ type: "new", id: null });
-              }}
-              icon={<IconPlus className="text-muted-foreground" />}
-            />
-          </TooltipTrigger>
-          <TooltipContent>Create a new deck</TooltipContent>
-        </Tooltip>
-      </div>
+      />
 
       {/* Decks list */}
       {isPending && (
@@ -277,67 +410,20 @@ export default function Decks() {
           )}
           {decks.map((deck) => (
             <div key={deck.id}>
-              <NavLink
-                key={deck.id}
-                to={`/decks/${deck.id}`}
-                draggable
-                className={cn(
-                  "flex items-center gap-0.5 p-1 hover:bg-accent font-medium relative group",
-                  draggedDeck === deck.id && "opacity-50",
-                  dragOverDeck === deck.id && "bg-blue-100 dark:bg-blue-900/30",
-                  isDragging && draggedDeck === deck.id && "cursor-grabbing",
-                  draggedDeck &&
-                    descendants.has(deck.id) &&
-                    "cursor-not-allowed opacity-50",
-                )}
-                onDragStart={(e) => handleDragStart(e, deck.id)}
+              <DeckRow
+                deck={deck}
+                expanded={expanded}
+                draggedDeck={draggedDeck}
+                dragOverDeck={dragOverDeck}
+                isDragging={isDragging}
+                descendants={descendants}
+                onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
-                onDragOver={(e) => handleDragOver(e, deck.id)}
+                onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, deck.id)}
-                onMouseOver={() => prefetchDeck(deck.id, queryClient)}
-              >
-                {Array.from({ length: deck.depth }).map((_, i) => (
-                  <div className="w-6" key={i}></div>
-                ))}
-                <Button
-                  className="hover:bg-muted !p-0"
-                  size="icon-sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (deck.childCount === 0) return;
-                    toggleExpanded(deck.id);
-                  }}
-                >
-                  <ProjectIcon className="size-icon group-hover:hidden" />
-                  <IconChevronRight
-                    className={cn(
-                      "size-icon hidden group-hover:inline-block transition-transform",
-                      deck.childCount === 0 && "text-muted-foreground",
-                      expanded.has(deck.id) &&
-                        deck.childCount > 0 &&
-                        "rotate-90",
-                    )}
-                  />
-                </Button>
-
-                <div className="flex-1">{deck.name}</div>
-                <DeckDropdown deck={deck}>
-                  <Button
-                    className="p-1 h-full w-fit ml-auto hover:bg-muted"
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                    }}
-                  >
-                    <IconDots className="size-icon" />
-                  </Button>
-                </DeckDropdown>
-              </NavLink>
+                onDrop={handleDrop}
+                onToggleExpanded={toggleExpanded}
+              />
             </div>
           ))}
         </div>

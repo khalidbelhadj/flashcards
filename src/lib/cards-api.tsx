@@ -32,8 +32,11 @@ export async function getCards(deckId: string | null, filter?: string) {
 }
 
 export async function createCard(deckId: string, front: string, back: string) {
-  await db.insert(cardsTable).values({ deckId, front, back });
-  return deckId;
+  const newCards = await db
+    .insert(cardsTable)
+    .values({ deckId, front, back })
+    .returning();
+  return newCards[0].id;
 }
 
 export async function updateCard(cardId: string, front: string, back: string) {

@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { clsx, type ClassValue } from "clsx";
 import { api } from "src/lib/api-proxy";
-import { DecksRow } from "src/lib/schema";
+import { getDecks } from "src/lib/decks-api";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -52,6 +52,8 @@ export function formatDate(date: Date, capitalize = true) {
 export function formatNumber(num: number, locale?: string): string {
   return new Intl.NumberFormat(locale).format(num);
 }
+
+type DecksRow = Awaited<ReturnType<typeof getDecks>>[number];
 
 export type Deck = DecksRow & {
   cardCount: number;

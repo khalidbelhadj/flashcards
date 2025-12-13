@@ -2,6 +2,7 @@ import {
   DeckDialogueProvider,
   useDeckDialogue,
 } from "@/contexts/deck-dialogue-context";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { DeckSearch } from "./deck-search";
@@ -59,6 +60,7 @@ function Layout() {
   const [showSearch, setShowSearch] = useState(false);
   const navigate = useNavigate();
   const { openDialogue } = useDeckDialogue();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

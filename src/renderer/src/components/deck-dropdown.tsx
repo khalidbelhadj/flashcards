@@ -17,6 +17,7 @@ import {
   IconRefresh,
   IconTrash,
 } from "@tabler/icons-react";
+import { useState } from "react";
 
 export default function DeckDropdown({
   deck,
@@ -27,6 +28,7 @@ export default function DeckDropdown({
   children: React.ReactNode;
   align?: "start" | "end" | "center";
 }) {
+  const [isOpen, setIsOpen] = useState(false);
   const { mutateAsync: resetDeckHistory } = useResetDeckHistory();
   const { openDialogue } = useDeckDialogue();
 
@@ -35,12 +37,13 @@ export default function DeckDropdown({
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent align={align} onClick={(e) => e.stopPropagation()}>
         <DropdownMenuGroup>
           <DropdownMenuItem
             onSelect={() => {
+              setIsOpen(false);
               openDialogue({ type: "new", id: deck.id });
             }}
           >
@@ -62,6 +65,7 @@ export default function DeckDropdown({
 
           <DropdownMenuItem
             onSelect={() => {
+              setIsOpen(false);
               openDialogue({
                 type: "move",
                 id: deck.id,
@@ -74,6 +78,7 @@ export default function DeckDropdown({
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => {
+              setIsOpen(false);
               openDialogue({ type: "rename", id: deck.id, name: deck.name });
             }}
           >
@@ -84,6 +89,7 @@ export default function DeckDropdown({
           <DropdownMenuItem
             variant="destructive"
             onSelect={async () => {
+              setIsOpen(false);
               openDialogue({ type: "delete", id: deck.id });
             }}
           >

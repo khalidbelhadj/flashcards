@@ -39,7 +39,7 @@ export function useCreateDeck() {
       name: string;
       parentId: string | null;
     }) => {
-      await api.decks.createDeck(name, parentId);
+      return await api.decks.createDeck(name, parentId);
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ["decks"] });

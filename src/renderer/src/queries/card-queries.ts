@@ -7,6 +7,17 @@ import {
 import { api } from "src/lib/api-proxy";
 import type { CardsRow } from "src/lib/schema";
 
+export function useCard(cardId: string | null) {
+  return useQuery({
+    queryKey: ["card", cardId],
+    queryFn: async () => {
+      if (cardId === null) return null;
+      return await api.cards.getCard(cardId);
+    },
+    structuralSharing: false,
+  });
+}
+
 export function useCards(deckId: string, filter?: string) {
   return useQuery({
     queryKey: ["cards", deckId, filter],
@@ -36,6 +47,7 @@ export function useCreateCard() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["cards"] });
+      queryClient.invalidateQueries({ queryKey: ["card"] });
     },
   });
 }

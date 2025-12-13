@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useCreateDeck } from "@/queries/deck-queries";
 import { IconX } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router";
 
 export default function NewDeckDialog({
   open,
@@ -24,6 +25,7 @@ export default function NewDeckDialog({
 }) {
   const [location, setLocation] = useState<string | null>(id);
   const newDeckNameRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const { mutateAsync: createDeck } = useCreateDeck();
 
@@ -37,8 +39,9 @@ export default function NewDeckDialog({
     if (!name) {
       return;
     }
-    await createDeck({ name, parentId: location });
-    newDeckNameRef.current!.value = "";
+    const deck = await createDeck({ name, parentId: location });
+    if (newDeckNameRef.current) newDeckNameRef.current.value = "";
+    navigate(`/decks/${deck.id}`);
   };
 
   return (

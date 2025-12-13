@@ -69,6 +69,7 @@ app.whenReady().then(() => {
   ipcMain.on("open-confirm-window", () => {
     createConfirmWindow();
   });
+  ipcMain.removeAllListeners("api");
 
   registerApis();
   createWindow();

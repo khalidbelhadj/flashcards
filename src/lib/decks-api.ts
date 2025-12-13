@@ -80,10 +80,14 @@ export async function getById(id: string) {
 }
 
 export async function createDeck(name: string, parentId: string | null) {
-  await db.insert(decksTable).values({
-    name,
-    parentId,
-  });
+  const [deck] = await db
+    .insert(decksTable)
+    .values({
+      name,
+      parentId,
+    })
+    .returning();
+  return deck;
 }
 
 export async function renameDeck(id: string, name: string) {

@@ -6,7 +6,6 @@ import { useState } from "react";
 import { NavLink, useParams } from "react-router";
 import { Button } from "./ui/button";
 
-import { CardFooter } from "@/components/card";
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -257,7 +256,6 @@ export function Review() {
                   )}
                 </div>
               )}
-              <CardFooter card={card} />
             </div>
 
             {/* <div className="bg-background rounded-md border p-2">
