@@ -12,7 +12,8 @@ export default function Home() {
   const { data: due } = useDueCards(null);
 
   return (
-    <div className="w-full h-full flex flex-col items-center py-14 px-3 gap-4 overflow-clip max-h-screen min-h-0">
+    <div className="w-full h-full flex flex-col items-center px-3 gap-4 overflow-clip max-h-screen min-h-0">
+      <div id="desktop-header" className="w-full h-10 shrink-0" />
       <Decks />
       {due && due.length > 0 && (
         <Button asChild icon={<IconCards className="size-4" />}>

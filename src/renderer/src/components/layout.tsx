@@ -2,15 +2,15 @@ import {
   DeckDialogueProvider,
   useDeckDialogue,
 } from "@/contexts/deck-dialogue-context";
-import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet } from "react-router";
 import { DeckSearch } from "./deck-search";
 import DebugTools from "./debug-tools";
 import DeleteDeckDialog from "./delete-deck-dialog";
 import MoveDeckDialog from "./move-deck-dialog";
 import NewDeckDialog from "./new-deck-dialog";
 import RenameDeckDialogue from "./rename-deck-dialog";
+import ResetHistoryDialog from "./reset-history-dialog";
 
 Date.now = () => {
   return new Date("2025-08-08").getTime();
@@ -53,16 +53,31 @@ function DeckDialogues() {
           onClose={closeDialogue}
         />
       )}
+      {dialogue.type === "reset-history" && (
+        <ResetHistoryDialog
+          id={dialogue.id}
+          open={dialogue.type === "reset-history"}
+          onClose={closeDialogue}
+        />
+      )}
     </>
   );
 }
 
 function Layout() {
   const [showSearch, setShowSearch] = useState(false);
-  const navigate = useNavigate();
-  const { openDialogue } = useDeckDialogue();
-  const queryClient = useQueryClient();
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const isMac = navigator.platform.startsWith("Mac");
+      if (((isMac && e.metaKey) || (!isMac && e.ctrlKey)) && e.key === "p") {
+        e.preventDefault();
+        setShowSearch((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   return (
     <div className="w-screen h-screen bg-background-dark relative overflow-hidden">

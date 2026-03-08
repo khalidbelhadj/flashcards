@@ -50,7 +50,7 @@ export function useCreateDeck() {
 
 export function useDeckPath(id: string | null) {
   return useQuery({
-    queryKey: ["path", id],
+    queryKey: ["deck", id, "path"],
     queryFn: async () => {
       if (id === null) return [];
       return await api.decks.getPathTo(id);
@@ -131,7 +131,7 @@ export function useMoveDeck() {
     onSettled: async (_, __, { id }) => {
       await queryClient.invalidateQueries({ queryKey: ["decks"] });
       await queryClient.invalidateQueries({ queryKey: ["decks-recursive"] });
-      await queryClient.invalidateQueries({ queryKey: ["path", id] });
+      await queryClient.invalidateQueries({ queryKey: ["deck", id, "path"] });
     },
   });
 }

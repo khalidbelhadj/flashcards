@@ -7,7 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { IconSettings, IconSun, IconMoon, IconCheck } from "@tabler/icons-react";
+import { IconSettings, IconSun, IconMoon, IconCheck, IconBug } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 const fonts = [
@@ -31,6 +31,7 @@ export default function DebugTools() {
   const [uiFont, setUiFont] = useState(() => localStorage.getItem("debug-ui-font") || fonts[0].value);
   const [contentFont, setContentFont] = useState(() => localStorage.getItem("debug-content-font") || fonts[0].value);
   const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
+  const [cardInfo, setCardInfo] = useState(() => localStorage.getItem("debug-show-card-info") === "true");
 
   useEffect(() => {
     fonts.slice(1).forEach((f) => loadFont(f.label));
@@ -61,6 +62,12 @@ export default function DebugTools() {
     localStorage.setItem("debug-dark", String(next));
   };
 
+  const toggleCardInfo = () => {
+    const next = !cardInfo;
+    setCardInfo(next);
+    localStorage.setItem("debug-show-card-info", String(next));
+  };
+
   return (
     <div className="fixed bottom-3 left-3 z-50">
       <DropdownMenu>
@@ -74,6 +81,10 @@ export default function DebugTools() {
           <DropdownMenuItem onClick={toggleDark}>
             {dark ? <IconSun className="size-4" /> : <IconMoon className="size-4" />}
             {dark ? "Light mode" : "Dark mode"}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={toggleCardInfo}>
+            {cardInfo ? <IconCheck className="size-3.5" /> : <IconBug className="size-3.5" />}
+            Card Debug Info
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuLabel>UI Font</DropdownMenuLabel>

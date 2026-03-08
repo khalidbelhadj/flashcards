@@ -193,3 +193,25 @@ export function useDueCards(deckId: string | null) {
     structuralSharing: false,
   });
 }
+
+export function useNewCards(deckId: string | null) {
+  return useQuery({
+    queryKey: ["cards", deckId, "new"],
+    queryFn: async () => {
+      return await api.cards.getNewCards(deckId!);
+    },
+    enabled: !!deckId,
+    structuralSharing: false,
+  });
+}
+
+export function useCramCards(deckId: string | null) {
+  return useQuery({
+    queryKey: ["cards", deckId, "cram"],
+    queryFn: async () => {
+      return await api.cards.getCramCards(deckId!);
+    },
+    enabled: !!deckId,
+    structuralSharing: false,
+  });
+}

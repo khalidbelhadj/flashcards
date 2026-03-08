@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
   IconCards,
-  IconChevronRight,
+
   IconLoader,
   IconMenu2,
   IconPlus,
@@ -146,7 +146,7 @@ export default function DeckView() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </InputGroup>
-          <span className="text-xs text-muted-foreground tabular-nums bg-muted rounded-md px-2 py-0.5">
+          <span className="text-xs text-muted-foreground tabular-nums bg-muted border rounded-md px-2 py-0.5">
             {cards?.length ?? 0}
           </span>
           <div className="ml-auto shrink-0">

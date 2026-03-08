@@ -57,6 +57,7 @@ export const cardsTable = sqliteTable("cards", {
   interval: integer("interval").notNull().default(0),
   dueDate: text("due_date").notNull().default(new Date().toISOString()),
   n: integer("n").notNull().default(0),
+  easeFactor: integer("ease_factor").notNull().default(2500), // stored as EF * 1000 to avoid floats
   status: text({
     enum: ["new", "learning", "reviewing"],
   })

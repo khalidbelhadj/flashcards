@@ -18,6 +18,10 @@ export type DeckDialogue =
   | {
       type: "delete";
       id: string;
+    }
+  | {
+      type: "reset-history";
+      id: string;
     };
 
 interface DeckDialogueContextType {

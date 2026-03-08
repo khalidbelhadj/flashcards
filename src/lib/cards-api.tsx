@@ -69,7 +69,7 @@ export async function resetCardHistory(cardId: string) {
     await tx.delete(reviewsTable).where(eq(reviewsTable.cardId, cardId));
     await tx
       .update(cardsTable)
-      .set({ status: "new", lastReview: null, n: 0, interval: 0 })
+      .set({ status: "new", lastReview: null, n: 0, interval: 0, easeFactor: 2500 })
       .where(eq(cardsTable.id, cardId));
   });
 }
@@ -79,7 +79,7 @@ export async function resetDeckHistory(deckId: string) {
     await tx.delete(reviewsTable).where(eq(reviewsTable.deckId, deckId));
     await tx
       .update(cardsTable)
-      .set({ status: "new", lastReview: null, n: 0, interval: 0 })
+      .set({ status: "new", lastReview: null, n: 0, interval: 0, easeFactor: 2500 })
       .where(eq(cardsTable.deckId, deckId));
   });
 }
@@ -114,5 +114,26 @@ export async function getDueCards(deckId: string | null) {
         deckId ? eq(cardsTable.deckId, deckId) : undefined,
       ),
     )
+    .all();
+}
+
+export async function getNewCards(deckId: string) {
+  return await db
+    .select()
+    .from(cardsTable)
+    .where(
+      and(
+        eq(cardsTable.deckId, deckId),
+        eq(cardsTable.status, "new"),
+      ),
+    )
+    .all();
+}
+
+export async function getCramCards(deckId: string) {
+  return await db
+    .select()
+    .from(cardsTable)
+    .where(eq(cardsTable.deckId, deckId))
     .all();
 }

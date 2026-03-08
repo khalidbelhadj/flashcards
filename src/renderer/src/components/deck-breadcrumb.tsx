@@ -13,7 +13,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { prefetchDeck } from "@/lib/utils";
+import { displayName, prefetchDeck } from "@/lib/utils";
+import { IconChevronRight } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLayoutEffect, useRef, useState, useCallback } from "react";
 import { NavLink } from "react-router";
@@ -103,13 +104,13 @@ export function DeckBreadcrumb({ path, deckId }: DeckBreadcrumbProps) {
       >
         <span data-measure-decks className="inline-flex items-center">Decks</span>
         <span data-measure-ellipsis className="inline-flex items-center gap-1.5">
-          <span className="[&>svg]:size-3.5"><ChevronRightSvg /></span>
+          <IconChevronRight className="size-3.5" />
           <span className="flex size-5 items-center justify-center">…</span>
         </span>
         {path.map((p) => (
           <span key={p.id} data-measure-segment className="inline-flex items-center gap-1.5">
-            <span className="[&>svg]:size-3.5"><ChevronRightSvg /></span>
-            <span>{p.name}</span>
+            <IconChevronRight className="size-3.5" />
+            <span>{displayName(p.name)}</span>
           </span>
         ))}
       </div>
@@ -135,7 +136,7 @@ export function DeckBreadcrumb({ path, deckId }: DeckBreadcrumbProps) {
                     <DropdownMenuGroup>
                       {hiddenItems.map((deck) => (
                         <DropdownMenuItem key={deck.id} asChild>
-                          <NavLink to={`/decks/${deck.id}`}>{deck.name}</NavLink>
+                          <NavLink to={`/decks/${deck.id}`}>{displayName(deck.name)}</NavLink>
                         </DropdownMenuItem>
                       ))}
                     </DropdownMenuGroup>
@@ -154,15 +155,6 @@ export function DeckBreadcrumb({ path, deckId }: DeckBreadcrumbProps) {
   );
 }
 
-/** Inline chevron SVG matching lucide's ChevronRightIcon for measurement */
-function ChevronRightSvg() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m9 18 6-6-6-6" />
-    </svg>
-  );
-}
-
 function DeckBreadcrumbItem({
   deck,
   deckId,
@@ -176,14 +168,14 @@ function DeckBreadcrumbItem({
       <BreadcrumbSeparator className="shrink-0" />
       {deck.id === deckId ? (
         <BreadcrumbPage className="shrink-0 truncate max-w-48">
-          <NavLink to={`/decks/${deck.id}`}>{deck.name}</NavLink>
+          <NavLink to={`/decks/${deck.id}`}>{displayName(deck.name)}</NavLink>
         </BreadcrumbPage>
       ) : (
         <BreadcrumbItem
           className="shrink-0"
           onMouseOver={() => prefetchDeck(deck.id, queryClient)}
         >
-          <NavLink to={`/decks/${deck.id}`}>{deck.name}</NavLink>
+          <NavLink to={`/decks/${deck.id}`}>{displayName(deck.name)}</NavLink>
         </BreadcrumbItem>
       )}
     </>

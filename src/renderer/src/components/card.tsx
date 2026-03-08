@@ -1,11 +1,5 @@
-import {
-  useDeleteCard,
-  useDuplicateCard,
-  useResetCardHistory,
-  useUpdateCard,
-} from "@/queries/card-queries";
-import { useRef } from "react";
 import type { CardsRow } from "src/lib/schema";
+import { useDebugMode, ReviewDebugInfo } from "./review-debug";
 
 type CardProps = {
   card: CardsRow;
@@ -13,25 +7,7 @@ type CardProps = {
 };
 
 export function Card({ card, onSelect }: CardProps) {
-  const { mutateAsync: deleteCard } = useDeleteCard();
-  const { mutateAsync: resetCardHistory } = useResetCardHistory();
-  const { mutateAsync: duplicateCard } = useDuplicateCard();
-  const { mutateAsync: updateCard } = useUpdateCard();
-
-  const frontRef = useRef<HTMLTextAreaElement>(null);
-  const backRef = useRef<HTMLTextAreaElement>(null);
-
-  const handleDelete = async () => {
-    await deleteCard(card.id);
-  };
-
-  const handleResetHistory = async () => {
-    await resetCardHistory(card.id);
-  };
-
-  const handleDuplicate = async () => {
-    await duplicateCard(card.id);
-  };
+  const debugMode = useDebugMode();
 
   return (
     <div
@@ -58,6 +34,11 @@ export function Card({ card, onSelect }: CardProps) {
           <span className="text-muted-foreground">Empty</span>
         )}
       </div>
+      {debugMode && (
+        <div className="border-t px-2 py-1">
+          <ReviewDebugInfo card={card} />
+        </div>
+      )}
     </div>
   );
 }

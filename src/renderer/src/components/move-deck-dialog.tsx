@@ -12,6 +12,7 @@ import { useMoveDeck } from "@/queries/deck-queries";
 import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
+
 export default function MoveDeckDialog({
   open,
   onClose,
@@ -26,9 +27,11 @@ export default function MoveDeckDialog({
   const [location, setLocation] = useState<string | null>(parentId);
 
   const { mutateAsync: moveDeck } = useMoveDeck();
+  const [loading, setLoading] = useState(false);
 
   const handleMoveDeck = async () => {
     if (!id) return;
+    setLoading(true);
     await moveDeck({ id, parentId: location });
     onClose();
   };
@@ -60,7 +63,7 @@ export default function MoveDeckDialog({
           <Button onClick={onClose} variant="outline">
             Cancel
           </Button>
-          <Button onClick={handleMoveDeck}>Move</Button>
+          <Button onClick={handleMoveDeck} loading={loading}>{loading ? "Moving" : "Move"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

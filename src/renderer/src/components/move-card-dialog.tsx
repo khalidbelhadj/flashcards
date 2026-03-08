@@ -22,11 +22,13 @@ export default function MoveCardDialog({
 }) {
   const [location, setLocation] = useState<string | null>(card?.deckId ?? null);
   const { mutateAsync: moveCard } = useMoveCard();
+  const [loading, setLoading] = useState(false);
 
   const handleMoveCard = async () => {
     if (!card) return;
     // TODO: error here
     if (!location) return;
+    setLoading(true);
     await moveCard({ cardId: card.id, deckId: location });
     onClose();
   };
@@ -58,7 +60,7 @@ export default function MoveCardDialog({
           <Button onClick={onClose} variant="outline">
             Cancel
           </Button>
-          <Button onClick={handleMoveCard}>Move</Button>
+          <Button onClick={handleMoveCard} loading={loading}>{loading ? "Moving" : "Move"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

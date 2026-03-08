@@ -1,22 +1,32 @@
 import ProjectIcon from "@/components/project-icon";
 import {
   Breadcrumb,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbList,
+  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, displayName } from "@/lib/utils";
 import {
   IconChevronDown,
   IconChevronRight,
   IconSearch,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { useDeckPath, useDecks } from "../queries/deck-queries";
 import NonIdealState from "./non-ideal-state";
 import { Button } from "./ui/button";
+import { DecksRow } from "src/lib/schema";
 
 interface DeckPickerProps {
   id: string | null;
@@ -70,28 +80,9 @@ export function DeckPicker({
               className="rounded-b-none border-none !ring-0 !outline-0 !border-0 shadow-none"
               autoFocus
             />
-            <Breadcrumb className="p-1 bg-background-dark border-b border-t">
-              <BreadcrumbList>
-                <BreadcrumbItem
-                  onClick={() => setId(null)}
-                  className="cursor-pointer"
-                >
-                  Decks
-                </BreadcrumbItem>
-                {path?.map((p) => (
-                  <>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem
-                      key={p.id}
-                      onClick={() => setId(p.id)}
-                      className="cursor-pointer"
-                    >
-                      {p.name}
-                    </BreadcrumbItem>
-                  </>
-                ))}
-              </BreadcrumbList>
-            </Breadcrumb>
+            <div className="p-1 bg-background-dark border-b border-t">
+              <PickerBreadcrumb path={path ?? []} onNavigate={setId} />
+            </div>
             <div className="flex flex-col h-48 overflow-auto">
               {decks?.length === 0 && (
                 <div className="flex items-center justify-center h-full">
@@ -102,17 +93,15 @@ export function DeckPicker({
                 </div>
               )}
               {decks?.map((deck) => (
-                <div className=" flex items-center">
+                <div className=" flex items-center" key={deck.id}>
                   <Button
-                    // variant="link"
-                    key={deck.id}
                     onClick={() => setId(deck.id)}
                     className="justify-start flex-1 !rounded-none px-2"
                     variant="ghost"
                     disabled={disabled?.includes(deck.id)}
                   >
                     <ProjectIcon className="size-3.5" />
-                    {deck.name}
+                    {displayName(deck.name)}
                     <IconChevronRight className="size-3.5 ml-auto" />
                   </Button>
                 </div>
@@ -124,3 +113,148 @@ export function DeckPicker({
     </div>
   );
 }
+
+function PickerBreadcrumb({
+  path,
+  onNavigate,
+}: {
+  path: DecksRow[];
+  onNavigate: (id: string | null) => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [collapseCount, setCollapseCount] = useState(0);
+
+  const calculate = useCallback(() => {
+    const container = containerRef.current;
+    const measure = measureRef.current;
+    if (!container || !measure) return;
+
+    const availableWidth = container.clientWidth;
+    const segments = measure.querySelectorAll<HTMLElement>("[data-measure-segment]");
+    const decksEl = measure.querySelector<HTMLElement>("[data-measure-decks]");
+    const ellipsisEl = measure.querySelector<HTMLElement>("[data-measure-ellipsis]");
+
+    if (!decksEl || !ellipsisEl) return;
+
+    const decksWidth = decksEl.offsetWidth;
+    const ellipsisWidth = ellipsisEl.offsetWidth;
+    const gap = 6;
+
+    const segmentWidths: number[] = [];
+    for (const seg of segments) {
+      segmentWidths.push(seg.offsetWidth + gap);
+    }
+
+    const totalWidth = decksWidth + segmentWidths.reduce((a, b) => a + b, 0);
+    if (totalWidth <= availableWidth) {
+      setCollapseCount(0);
+      return;
+    }
+
+    const reserved = decksWidth + ellipsisWidth + gap * 2;
+    let rightWidth = 0;
+    let visibleFromRight = 0;
+    for (let i = segmentWidths.length - 1; i >= 0; i--) {
+      if (reserved + rightWidth + segmentWidths[i] <= availableWidth) {
+        rightWidth += segmentWidths[i];
+        visibleFromRight++;
+      } else {
+        break;
+      }
+    }
+
+    visibleFromRight = Math.max(1, visibleFromRight);
+    setCollapseCount(path.length - visibleFromRight);
+  }, [path]);
+
+  useLayoutEffect(() => {
+    calculate();
+  }, [calculate]);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const observer = new ResizeObserver(() => calculate());
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [calculate]);
+
+  const hiddenItems = path.slice(0, collapseCount);
+  const visibleItems = path.slice(collapseCount);
+
+  return (
+    <div ref={containerRef} className="min-w-0 w-full relative">
+      {/* Hidden measurement row */}
+      <div
+        ref={measureRef}
+        aria-hidden
+        className="flex items-center gap-1.5 text-sm absolute top-0 left-0 invisible pointer-events-none whitespace-nowrap"
+      >
+        <span data-measure-decks className="inline-flex items-center">Decks</span>
+        <span data-measure-ellipsis className="inline-flex items-center gap-1.5">
+          <IconChevronRight className="size-3.5" />
+          <span className="flex size-5 items-center justify-center">…</span>
+        </span>
+        {path.map((p) => (
+          <span key={p.id} data-measure-segment className="inline-flex items-center gap-1.5">
+            <IconChevronRight className="size-3.5" />
+            <span>{displayName(p.name)}</span>
+          </span>
+        ))}
+      </div>
+
+      {/* Visible breadcrumb */}
+      <Breadcrumb>
+        <BreadcrumbList className="flex-nowrap">
+          <BreadcrumbItem className="shrink-0 cursor-pointer" onClick={() => onNavigate(null)}>
+            Decks
+          </BreadcrumbItem>
+
+          {hiddenItems.length > 0 && (
+            <>
+              <BreadcrumbSeparator className="shrink-0" />
+              <BreadcrumbItem className="shrink-0">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex size-6 items-center justify-center cursor-pointer rounded-sm hover:bg-muted transition-colors">
+                      <BreadcrumbEllipsis />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuGroup>
+                      {hiddenItems.map((deck) => (
+                        <DropdownMenuItem key={deck.id} onClick={() => onNavigate(deck.id)}>
+                          {displayName(deck.name)}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </BreadcrumbItem>
+            </>
+          )}
+
+          {visibleItems.map((p, i) => (
+            <span key={p.id} className="contents">
+              <BreadcrumbSeparator className="shrink-0" />
+              {i === visibleItems.length - 1 ? (
+                <BreadcrumbPage className="shrink-0 truncate max-w-48">
+                  {displayName(p.name)}
+                </BreadcrumbPage>
+              ) : (
+                <BreadcrumbItem
+                  className="shrink-0 cursor-pointer"
+                  onClick={() => onNavigate(p.id)}
+                >
+                  {displayName(p.name)}
+                </BreadcrumbItem>
+              )}
+            </span>
+          ))}
+        </BreadcrumbList>
+      </Breadcrumb>
+    </div>
+  );
+}
+

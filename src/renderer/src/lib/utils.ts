@@ -49,6 +49,10 @@ export function formatDate(date: Date, capitalize = true) {
  * @param locale
  * @returns
  */
+export function displayName(name: string): string {
+  return name.trim() || "Untitled";
+}
+
 export function formatNumber(num: number, locale?: string): string {
   return new Intl.NumberFormat(locale).format(num);
 }

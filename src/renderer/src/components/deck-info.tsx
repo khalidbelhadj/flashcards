@@ -13,10 +13,22 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useDeckDialogue } from "@/contexts/deck-dialogue-context";
-import { cn, formatDate, formatNumber, prefetchDeck } from "@/lib/utils";
+
+import {
+  cn,
+  Deck,
+  displayName,
+  formatDate,
+  formatNumber,
+  prefetchDeck,
+} from "@/lib/utils";
 import { useDueCards } from "@/queries/card-queries";
-import { useDeck, useDecks, useSetLastReviewed } from "@/queries/deck-queries";
+import {
+  useDeck,
+  useDecks,
+  useRenameDeck,
+  useSetLastReviewed,
+} from "@/queries/deck-queries";
 import {
   IconCards,
   IconChevronDown,
@@ -28,6 +40,70 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
+import DeckDropdown from "./deck-dropdown";
+
+function DeckTitle({ deck }: { deck: Deck }) {
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(deck.name);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { mutateAsync: renameDeck } = useRenameDeck();
+
+  useEffect(() => {
+    if (!editing) setName(deck.name);
+  }, [deck.name, editing]);
+
+  const handleSave = async () => {
+    setEditing(false);
+    const trimmed = name.trim();
+    if (trimmed !== deck.name) {
+      await renameDeck({ id: deck.id, name: trimmed });
+    }
+  };
+
+  const handleStartEditing = () => {
+    setName(deck.name);
+    setEditing(true);
+    setTimeout(() => inputRef.current?.select());
+  };
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        autoFocus
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        onBlur={handleSave}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") handleSave();
+          if (e.key === "Escape") {
+            setName(deck.name);
+            setEditing(false);
+          }
+        }}
+        className="font-semibold text-md bg-transparent border border-ring rounded-md px-1.5 py-0.5 outline-none"
+      />
+    );
+  }
+
+  return (
+    <div className="group flex items-stretch gap-0.5">
+      <button
+        onClick={handleStartEditing}
+        className="font-semibold text-md px-1.5 py-0.5 cursor-text rounded-l-md group-hover:bg-muted transition-colors"
+      >
+        <span className={cn(!name.trim() && "text-muted-foreground")}>
+          {displayName(name)}
+        </span>
+      </button>
+      <DeckDropdown deck={deck} align="start">
+        <button className="px-1 flex items-center rounded-r-md group-hover:bg-muted transition-colors">
+          <IconChevronDown className="size-3.5 text-muted-foreground" />
+        </button>
+      </DeckDropdown>
+    </div>
+  );
+}
 
 function ReviewButton({ id }: { id: string }) {
   const navigate = useNavigate();
@@ -65,24 +141,46 @@ function ReviewButton({ id }: { id: string }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={() => navigate(`/decks/${id}/review?mode=cram`)}
-          >
-            <IconCards className="size-4" />
-            Cram all cards
-            <Badge variant="secondary" className="ml-auto">
-              {deck?.cardCount ?? 0}
-            </Badge>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => navigate(`/decks/${id}/review?mode=new`)}
-          >
-            <IconSparkles className="size-4" />
-            Review new only
-            <Badge variant="secondary" className="ml-auto">
-              {deck?.new ?? 0}
-            </Badge>
-          </DropdownMenuItem>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <DropdownMenuItem
+                  disabled={!deck?.cardCount}
+                  onClick={() => navigate(`/decks/${id}/review?mode=cram`)}
+                >
+                  <IconCards className="size-4" />
+                  Cram all cards
+                  <Badge variant="secondary" className="ml-auto">
+                    {deck?.cardCount ?? 0}
+                  </Badge>
+                </DropdownMenuItem>
+              </div>
+            </TooltipTrigger>
+            {!deck?.cardCount && (
+              <TooltipContent side="left">No cards in this deck</TooltipContent>
+            )}
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <DropdownMenuItem
+                  disabled={!deck?.new}
+                  onClick={() => navigate(`/decks/${id}/review?mode=new`)}
+                >
+                  <IconSparkles className="size-4" />
+                  Review new only
+                  <Badge variant="secondary" className="ml-auto">
+                    {deck?.new ?? 0}
+                  </Badge>
+                </DropdownMenuItem>
+              </div>
+            </TooltipTrigger>
+            {!deck?.new && (
+              <TooltipContent side="left">
+                No new cards to review
+              </TooltipContent>
+            )}
+          </Tooltip>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -91,8 +189,6 @@ function ReviewButton({ id }: { id: string }) {
 
 export default function DeckInfo({ id }: { id: string }) {
   const queryClient = useQueryClient();
-  const { openDialogue } = useDeckDialogue();
-
   const {
     data: deck,
     isPending: isDeckPending,
@@ -113,7 +209,7 @@ export default function DeckInfo({ id }: { id: string }) {
             {!isDeckPending && !isDeckError && (
               <div className="flex items-center gap-1">
                 <ProjectIcon className="size-4" />
-                <div className="font-semibold text-md">{deck.name}</div>
+                <DeckTitle deck={deck} />
               </div>
             )}
 
@@ -176,27 +272,51 @@ export default function DeckInfo({ id }: { id: string }) {
             {!isSubdecksPending &&
               !isSubdecksError &&
               subDecks?.map((deck) => (
-                <Tooltip delayDuration={500}>
-                  <TooltipTrigger>
-                    <NavLink
-                      to={`/decks/${deck.id}`}
-                      className="min-w-36 w-36 px-2 h-7 bg-background border rounded-md font-medium flex items-center gap-1 hover:bg-accent"
-                      prefetch="intent"
-                      onMouseOver={() => prefetchDeck(deck.id, queryClient)}
-                    >
-                      <div className="size-4">
-                        <ProjectIcon className="size-3.5" />
-                      </div>
-                      <div className="truncate text-sm">{deck.name}</div>
-                    </NavLink>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">{deck.name}</TooltipContent>
-                </Tooltip>
+                <SubdeckItem key={deck.id} deck={deck as Deck} queryClient={queryClient} />
               ))}
           </ScrollableRow>
         </div>
       </div>
     </div>
+  );
+}
+
+function SubdeckItem({ deck, queryClient }: { deck: Deck; queryClient: ReturnType<typeof useQueryClient> }) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  return (
+    <Tooltip delayDuration={500} open={dropdownOpen ? false : undefined}>
+      <TooltipTrigger>
+        <div
+          className="group/subdeck relative min-w-36 w-36 h-7 bg-background border rounded-md font-medium flex items-center hover:bg-accent"
+          onMouseOver={() => prefetchDeck(deck.id, queryClient)}
+        >
+          <NavLink
+            to={`/decks/${deck.id}`}
+            className="flex items-center gap-1 px-2 h-full flex-1 min-w-0"
+            prefetch="intent"
+          >
+            <div className="size-4 shrink-0">
+              <ProjectIcon className="size-3.5" />
+            </div>
+            <div className="truncate text-sm">
+              {displayName(deck.name)}
+            </div>
+          </NavLink>
+          <DeckDropdown deck={deck} align="start" onOpenChange={setDropdownOpen}>
+            <button
+              className="absolute right-0 top-0 bottom-0 px-1 flex items-center rounded-r-md bg-background group-hover/subdeck:bg-muted border-l opacity-0 group-hover/subdeck:opacity-100 transition-all"
+              onClick={(e) => e.preventDefault()}
+            >
+              <IconChevronDown className="size-3 text-muted-foreground" />
+            </button>
+          </DeckDropdown>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">
+        {displayName(deck.name)}
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -231,18 +351,17 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
   const scroll = (direction: "left" | "right") => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollBy({ left: direction === "left" ? -150 : 150, behavior: "smooth" });
+    el.scrollBy({
+      left: direction === "left" ? -150 : 150,
+      behavior: "smooth",
+    });
   };
 
   return (
     <div className="relative">
       {canScrollLeft && (
         <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center bg-gradient-to-r from-card from-60% to-transparent pr-4">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => scroll("left")}
-          >
+          <Button variant="ghost" size="icon-sm" onClick={() => scroll("left")}>
             <IconChevronLeft className="size-4" />
           </Button>
         </div>

@@ -13,6 +13,7 @@ import {
   cn,
   Deck,
   DeckWithDepth,
+  displayName,
   flatten,
   prefetchDeck,
 } from "@/lib/utils";
@@ -54,7 +55,7 @@ function DecksHeader({
       onDragLeave={onDragLeave}
       onDrop={onDrop}
     >
-      <div className="font-medium text-muted-foreground flex items-center gap-2">
+      <div className="text-muted-foreground flex items-center gap-2">
         Decks
         {!isPending && !isError && (
           <Tooltip>
@@ -160,7 +161,14 @@ function DeckRow({
         />
       </Button>
 
-      <div className="flex-1 truncate">{deck.name}</div>
+      <div
+        className={cn(
+          "flex-1 truncate",
+          !deck.name.trim() && "text-muted-foreground",
+        )}
+      >
+        {displayName(deck.name)}
+      </div>
       <div className="flex items-center gap-0.5 w-20 shrink-0">
         {deck.cardCount > 0 ? (
           <>

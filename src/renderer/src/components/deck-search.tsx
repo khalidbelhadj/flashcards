@@ -9,6 +9,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Badge } from "@/components/ui/badge";
 import { formatNumber } from "@/lib/utils";
 import { useAllDecks, useDeckPath } from "@/queries/deck-queries";
 import { useEffect, useMemo, useState } from "react";
@@ -39,26 +40,24 @@ function DeckListItem({ id, name, cardCount, onClose }: DeckListItemProps) {
         navigate(`/decks/${id}`);
         onClose();
       }}
-      className="flex flex-col items-start gap-0 !px-2 !py-1"
+      className="!px-2 !py-1 [&>svg:last-child]:!hidden"
     >
-      <div className="flex w-full items-center gap-1">
-        <div className="flex items-center gap-1 text-base font-medium min-w-0">
-          <ProjectIcon className="!size-icon-sm" />
-          <span className="text-sm truncate flex-1 min-w-0">{name}</span>
+      <div className="flex flex-col gap-0 min-w-0 flex-1">
+        <div className="flex w-full items-center gap-1">
+          <div className="flex items-center gap-1 text-base font-medium min-w-0">
+            <ProjectIcon className="!size-icon-sm" />
+            <span className="text-sm truncate flex-1 min-w-0">{name}</span>
+          </div>
+          <Badge variant="secondary" className="ml-auto">
+            {formatNumber(cardCount)}
+          </Badge>
         </div>
-        <div className="text-xs text-muted-foreground ml-auto">
-          {cardCount === 0
-            ? "No cards"
-            : cardCount === 1
-              ? "1 card"
-              : `${formatNumber(cardCount)} cards`}
-        </div>
+        {pathString && (
+          <span className="text-xs text-muted-foreground text-nowrap w-full truncate">
+            {pathString}
+          </span>
+        )}
       </div>
-      {pathString && (
-        <span className="text-xs text-muted-foreground text-nowrap w-full truncate">
-          {pathString}
-        </span>
-      )}
     </CommandItem>
   );
 }

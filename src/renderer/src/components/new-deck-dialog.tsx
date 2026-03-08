@@ -28,19 +28,21 @@ export default function NewDeckDialog({
   const navigate = useNavigate();
 
   const { mutateAsync: createDeck } = useCreateDeck();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLocation(id);
   }, [id]);
 
   const handleCreateDeck = async () => {
-    onClose();
     const name = newDeckNameRef.current?.value.trim();
     if (!name) {
       return;
     }
+    setLoading(true);
     const deck = await createDeck({ name, parentId: location });
     if (newDeckNameRef.current) newDeckNameRef.current.value = "";
+    onClose();
     navigate(`/decks/${deck.id}`);
   };
 
@@ -75,7 +77,7 @@ export default function NewDeckDialog({
           <Button onClick={onClose} variant="outline">
             Cancel
           </Button>
-          <Button onClick={handleCreateDeck}>Create</Button>
+          <Button onClick={handleCreateDeck} loading={loading}>{loading ? "Creating" : "Create"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

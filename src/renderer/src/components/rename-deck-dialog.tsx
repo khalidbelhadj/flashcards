@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRenameDeck } from "@/queries/deck-queries";
 import { IconX } from "@tabler/icons-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export default function RenameDeckDialogue({
   open,
@@ -25,16 +25,18 @@ export default function RenameDeckDialogue({
 }) {
   const { mutateAsync: renameDeck } = useRenameDeck();
   const renameRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleRenameSave = async () => {
     if (!id) return;
-    onClose();
     const newName = renameRef.current?.value.trim();
     if (!newName) {
       alert("Deck name is required");
       return;
     }
+    setLoading(true);
     await renameDeck({ id, name: newName });
+    onClose();
   };
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -66,8 +68,8 @@ export default function RenameDeckDialogue({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" onClick={handleRenameSave}>
-            Save
+          <Button type="submit" onClick={handleRenameSave} loading={loading}>
+            {loading ? "Saving" : "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>

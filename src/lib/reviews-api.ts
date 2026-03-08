@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { getCard, updateCardLastReview } from "src/lib/cards-api";
 import db from "src/lib/db";
-import { Minutes, schedule } from "src/lib/schedule";
+import { schedule } from "src/lib/schedule";
 import { cardsTable, Rating, reviewsTable } from "src/lib/schema";
 
 export async function createReview(
@@ -14,12 +14,18 @@ export async function createReview(
     throw new Error("Card not found");
   }
 
-  const interval: Minutes = await schedule(card, rating);
-  const dueDate = new Date(Date.now() + interval * 60 * 1000);
+  const result = schedule(card, rating);
+  const dueDate = new Date(Date.now() + result.interval * 60 * 1000);
 
   await db
     .update(cardsTable)
-    .set({ interval, dueDate: dueDate.toISOString(), n: card.n + 1 })
+    .set({
+      interval: result.interval,
+      dueDate: dueDate.toISOString(),
+      n: result.n,
+      easeFactor: result.easeFactor,
+      status: result.status,
+    })
     .where(eq(cardsTable.id, cardId));
 
   await db.insert(reviewsTable).values({

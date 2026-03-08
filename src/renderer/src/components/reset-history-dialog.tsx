@@ -6,12 +6,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useDeck, useDeleteDeck } from "@/queries/deck-queries";
+import { useResetDeckHistory } from "@/queries/card-queries";
 import { IconX } from "@tabler/icons-react";
 import { useState } from "react";
-import { useNavigate } from "react-router";
 
-export default function DeleteDeckDialog({
+export default function ResetHistoryDialog({
   open,
   onClose,
   id,
@@ -20,38 +19,34 @@ export default function DeleteDeckDialog({
   onClose: () => void;
   id: string;
 }) {
-  const { mutateAsync: deleteDeck } = useDeleteDeck();
-  const { data: deck } = useDeck(id);
-  const navigate = useNavigate();
+  const { mutateAsync: resetDeckHistory } = useResetDeckHistory();
   const [loading, setLoading] = useState(false);
 
-  const handleDeleteDeck = async () => {
-    const parentId = deck?.parentId;
+  const handleReset = async () => {
     setLoading(true);
-    await deleteDeck(id);
+    await resetDeckHistory(id);
     onClose();
-    navigate(parentId ? `/decks/${parentId}` : `/`);
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent showCloseButton={false}>
         <DialogHeader className="flex flex-row justify-between items-center">
-          <DialogTitle>Delete deck</DialogTitle>
+          <DialogTitle>Reset review history</DialogTitle>
           <Button variant="ghost" size="icon-sm" onClick={onClose}>
             <IconX className="size-4" />
           </Button>
         </DialogHeader>
         <div className="p-2 text-sm text-muted-foreground">
-          Are you sure you want to delete this deck? This action cannot be
-          undone.
+          This will reset all review history for cards in this deck. All cards
+          will be treated as new. This action cannot be undone.
         </div>
         <DialogFooter>
           <Button onClick={onClose} variant="outline">
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDeleteDeck} loading={loading}>
-            {loading ? "Deleting" : "Delete"}
+          <Button variant="destructive" onClick={handleReset} loading={loading}>
+            {loading ? "Resetting" : "Reset history"}
           </Button>
         </DialogFooter>
       </DialogContent>
