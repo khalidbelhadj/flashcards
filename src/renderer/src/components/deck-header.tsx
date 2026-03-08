@@ -34,7 +34,11 @@ export default function DeckHeader({ id }: { id: string }) {
 
       {isPending && <Skeleton className="h-5 w-24" />}
 
-      {!isPending && !isError && <DeckBreadcrumb path={path} deckId={id} />}
+      {!isPending && !isError && (
+        <div className="min-w-0 w-[calc(100%-6rem)]">
+          <DeckBreadcrumb path={path} deckId={id} />
+        </div>
+      )}
 
       {!isDeckPending && !isDeckError && (
         <DeckDropdown deck={deck}>

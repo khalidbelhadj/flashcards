@@ -16,11 +16,11 @@
   --background: oklch(1 0 0);
   --background-dark: oklch(0.97 0 0);
   --background-darker: oklch(0.955 0.001 106);
-  --foreground: oklch(0.147 0.004 49.25);
+  --foreground: oklch(0.25 0.004 49.25);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.147 0.004 49.25);
+  --card-foreground: oklch(0.25 0.004 49.25);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.147 0.004 49.25);
+  --popover-foreground: oklch(0.25 0.004 49.25);
 
   /* Blue primary override */
   --primary: oklch(0.588 0.178 259);
@@ -82,11 +82,11 @@
   --background: oklch(0.16 0.004 49);
   --background-dark: oklch(0.13 0.003 49);
   --background-darker: oklch(0.10 0.002 49);
-  --foreground: oklch(0.985 0.001 106.423);
+  --foreground: oklch(0.90 0.001 106.423);
   --card: oklch(0.205 0.006 56);
-  --card-foreground: oklch(0.985 0.001 106.423);
+  --card-foreground: oklch(0.90 0.001 106.423);
   --popover: oklch(0.22 0.006 56);
-  --popover-foreground: oklch(0.985 0.001 106.423);
+  --popover-foreground: oklch(0.90 0.001 106.423);
 
   /* Blue primary stays blue */
   --primary: oklch(0.62 0.178 259);

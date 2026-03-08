@@ -21,7 +21,6 @@ import {
   IconCards,
   IconChevronDown,
   IconCircleDashed,
-  IconPlus,
   IconSparkles,
 } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -116,13 +115,6 @@ export default function DeckInfo({ id }: { id: string }) {
 
             {/* Actions */}
             <div className="flex items-center gap-2 ml-auto">
-              <Button
-                variant="outline"
-                onClick={() => openDialogue({ type: "new", id })}
-                icon={<IconPlus />}
-              >
-                New deck
-              </Button>
               <ReviewButton id={id} />
             </div>
           </div>
