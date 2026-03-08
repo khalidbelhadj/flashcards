@@ -48,6 +48,7 @@ export function useCreateCard() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["cards"] });
       queryClient.invalidateQueries({ queryKey: ["card"] });
+      window.electron.ipcRenderer.send("invalidate-queries", ["cards", "card"]);
     },
   });
 }

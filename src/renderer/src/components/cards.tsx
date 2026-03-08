@@ -1,9 +1,9 @@
 import { Card } from "@/components/card";
 import NonIdealState from "@/components/non-ideal-state";
+import NewCardDialog from "@/components/new-card-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
@@ -11,17 +11,14 @@ import {
 } from "@/components/ui/tooltip";
 import { formatNumber } from "@/lib/utils";
 import {
-  useCard,
   useCards,
-  useCreateCard,
-  useUpdateCard,
 } from "@/queries/card-queries";
-import { IconPlus, IconSearch, IconX } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { IconPlus, IconSearch } from "@tabler/icons-react";
+import { useState } from "react";
 
 export default function Cards({ id }: { id: string }) {
   const [filter, setFilter] = useState("");
-  const [activeCardId, setActiveCardId] = useState<string | null | "new">(null);
+  const [newCardOpen, setNewCardOpen] = useState(false);
 
   const { data: cards, isPending, isError } = useCards(id, filter);
 
@@ -59,8 +56,13 @@ export default function Cards({ id }: { id: string }) {
 
             <Button
               variant="outline"
-              onClick={() => {
-                setActiveCardId("new");
+              onClick={async () => {
+                const visible = await window.electron.ipcRenderer.invoke("is-new-card-window-visible");
+                if (visible) {
+                  window.electron.ipcRenderer.invoke("open-new-card-window", id);
+                } else {
+                  setNewCardOpen(true);
+                }
               }}
               className="ml-auto"
               icon={<IconPlus />}
@@ -91,9 +93,7 @@ export default function Cards({ id }: { id: string }) {
                 <Card
                   key={card.id}
                   card={card}
-                  onSelect={(id) =>
-                    setActiveCardId((oldId) => (oldId === id ? null : id))
-                  }
+                  onSelect={() => {}}
                 />
               ))}
 
@@ -105,103 +105,7 @@ export default function Cards({ id }: { id: string }) {
         </div>
       </div>
 
-      {/* Edit card */}
-      {activeCardId !== null && (
-        <EditCard
-          deckId={id}
-          key={activeCardId}
-          activeCardId={activeCardId}
-          setActiveCardId={setActiveCardId}
-        />
-      )}
+      <NewCardDialog open={newCardOpen} onClose={() => setNewCardOpen(false)} deckId={id} />
     </main>
-  );
-}
-
-function EditCard({
-  deckId,
-  activeCardId,
-  setActiveCardId,
-}: {
-  deckId: string;
-  activeCardId: string | "new";
-  setActiveCardId: (id: string | null) => void;
-}) {
-  const { data: card } = useCard(activeCardId === "new" ? null : activeCardId);
-  const { mutateAsync: updateCard } = useUpdateCard();
-  const { mutateAsync: createCard } = useCreateCard();
-
-  const [front, setFront] = useState(card?.front || "");
-  const [back, setBack] = useState(card?.back || "");
-
-  const handleSave = async () => {
-    if (activeCardId === "new") {
-      const newCardId = await createCard({
-        deckId,
-        front,
-        back,
-      });
-      setActiveCardId(newCardId);
-      return;
-    }
-    await updateCard({
-      cardId: activeCardId,
-      front,
-      back,
-    });
-  };
-
-  useEffect(() => {
-    setFront(card?.front || "");
-    setBack(card?.back || "");
-  }, [card]);
-
-  return (
-    <div className="bg-background border-l w-lg">
-      <div className="p-3 flex items-center">
-        <Button
-          variant="secondary"
-          className="font-mono text-xs px-1 size-fit rounded-sm"
-          onClick={() => navigator.clipboard.writeText(card?.id ?? "")}
-        >
-          {activeCardId}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => {
-            setActiveCardId(null);
-          }}
-          className="ml-auto"
-          icon={<IconX />}
-        >
-          Close
-        </Button>
-      </div>
-      <div className="p-5 flex flex-col gap-5">
-        <div className="flex flex-col gap-2">
-          <div className="text-sm rounded-sm w-fit px-1.5 flex items-center gap-1 bg-muted text-muted-foreground font-medium">
-            Front
-          </div>
-          <Textarea
-            value={front}
-            autoFocus
-            onChange={(e) => setFront(e.target.value)}
-            key={`back-${activeCardId}`}
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <div className="text-sm rounded-sm w-fit px-1.5 flex items-center gap-1 bg-muted text-muted-foreground font-medium">
-            Back
-          </div>
-          <Textarea
-            key={`back-${activeCardId}`}
-            value={back}
-            onChange={(e) => setBack(e.target.value)}
-          />
-        </div>
-        <Button onClick={handleSave}>Save</Button>
-      </div>
-    </div>
   );
 }

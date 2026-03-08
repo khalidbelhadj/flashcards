@@ -1,6 +1,7 @@
 import Deck from "@/components/deck";
 import Home from "@/components/home";
 import Layout from "@/components/layout";
+import NewCardPage from "@/components/new-card-page";
 import UI from "@/components/ui";
 import { Route, Routes } from "react-router";
 import { Review } from "./components/review";
@@ -8,6 +9,7 @@ import { Review } from "./components/review";
 export default function App() {
   return (
     <Routes>
+      <Route path="/new-card" element={<NewCardPage />} />
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="/ui" element={<UI />} />

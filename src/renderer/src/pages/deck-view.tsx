@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import NewCardDialog from "@/components/new-card-dialog";
 import {
   IconCards,
 
@@ -31,6 +32,7 @@ export default function DeckView() {
   const { deckId } = useParams<{ deckId: string }>();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [newCardOpen, setNewCardOpen] = useState(false);
   const { data: deck, isPending: isDeckPending, isError: isDeckError } = useDeck(deckId!);
   const { data: subDecks } = useDecks(deckId!);
   const { data: cards, isPending: isCardsPending } = useCards(deckId!, search || undefined);
@@ -53,6 +55,7 @@ export default function DeckView() {
   }
 
   return (
+    <>
     <div className="flex flex-col h-screen">
       {/* Breadcrumb bar */}
       <header className="h-10 border-b flex items-center justify-center px-4 shrink-0">
@@ -150,7 +153,7 @@ export default function DeckView() {
             {cards?.length ?? 0}
           </span>
           <div className="ml-auto shrink-0">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => setNewCardOpen(true)}>
               <IconPlus data-icon="inline-start" /> New card
             </Button>
           </div>
@@ -200,5 +203,7 @@ export default function DeckView() {
         </div>
       </main>
     </div>
+      <NewCardDialog open={newCardOpen} onClose={() => setNewCardOpen(false)} deckId={deckId!} />
+    </>
   );
 }

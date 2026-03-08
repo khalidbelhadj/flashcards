@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,13 +10,12 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useDeckDialogue } from "@/contexts/deck-dialogue-context";
-import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useDeckDialogue } from "@/contexts/deck-dialogue-context";
 import { Deck } from "@/lib/utils";
 import { useDueCards } from "@/queries/card-queries";
 import {
@@ -52,9 +52,20 @@ export default function DeckDropdown({
   const { data: dueCards } = useDueCards(deck.id);
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={(open) => { setIsOpen(open); onOpenChangeProp?.(open); if (!open) setCopied(false); }}>
+    <DropdownMenu
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        onOpenChangeProp?.(open);
+        if (!open) setCopied(false);
+      }}
+    >
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent align={align} onClick={(e) => e.stopPropagation()} onCloseAutoFocus={(e) => e.preventDefault()}>
+      <DropdownMenuContent
+        align={align}
+        onClick={(e) => e.stopPropagation()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <DropdownMenuGroup>
           <DropdownMenuItem
             onSelect={() => {
@@ -63,7 +74,7 @@ export default function DeckDropdown({
             }}
           >
             <IconPlus className="size-icon" />
-            New deck
+            New subdeck
           </DropdownMenuItem>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
@@ -100,17 +111,23 @@ export default function DeckDropdown({
               copiedTimeout.current = setTimeout(() => setCopied(false), 1500);
             }}
           >
-            {copied ? <IconCheck className="size-icon" /> : <IconCopy className="size-icon" />}
+            {copied ? (
+              <IconCheck className="size-icon" />
+            ) : (
+              <IconCopy className="size-icon" />
+            )}
             Copy ID
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => {
               setIsOpen(false);
-              setTimeout(() => openDialogue({
-                type: "move",
-                id: deck.id,
-                parentId: deck.parentId,
-              }));
+              setTimeout(() =>
+                openDialogue({
+                  type: "move",
+                  id: deck.id,
+                  parentId: deck.parentId,
+                }),
+              );
             }}
           >
             <IconArrowsMove className="size-icon" />
@@ -119,7 +136,9 @@ export default function DeckDropdown({
           <DropdownMenuItem
             onSelect={() => {
               setIsOpen(false);
-              setTimeout(() => openDialogue({ type: "rename", id: deck.id, name: deck.name }));
+              setTimeout(() =>
+                openDialogue({ type: "rename", id: deck.id, name: deck.name }),
+              );
             }}
           >
             <IconEdit className="size-icon" />
@@ -130,7 +149,9 @@ export default function DeckDropdown({
             variant="destructive"
             onSelect={() => {
               setIsOpen(false);
-              setTimeout(() => openDialogue({ type: "reset-history", id: deck.id }));
+              setTimeout(() =>
+                openDialogue({ type: "reset-history", id: deck.id }),
+              );
             }}
           >
             <IconRefresh className="size-icon text-destructive" />
@@ -168,7 +189,9 @@ function ReviewOption({
     <DropdownMenuItem disabled={disabled} onSelect={onSelect}>
       {icon}
       {label}
-      <Badge variant="secondary" className="ml-auto">{count}</Badge>
+      <Badge variant="secondary" className="ml-auto">
+        {count}
+      </Badge>
     </DropdownMenuItem>
   );
 

@@ -2,6 +2,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import "./assets/main.css";
 
 import App from "@/app";
+import { isNewCardMode } from "@/main-utils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -15,6 +16,15 @@ const queryClient = new QueryClient({
   },
 });
 
+// Cross-window query invalidation
+window.electron.ipcRenderer.on("invalidate-queries", (_event, queryKeys: string[]) => {
+  for (const key of queryKeys) {
+    queryClient.invalidateQueries({ queryKey: [key] });
+  }
+});
+
+const initialEntries = isNewCardMode() ? ["/new-card"] : ["/"];
+
 const rootElement = document.getElementById("root")!;
 
 if (!rootElement.innerHTML) {
@@ -24,12 +34,10 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <MemoryRouter>
+          <MemoryRouter initialEntries={initialEntries}>
             <App />
           </MemoryRouter>
-          {/* <ReactQueryDevtools initialIsOpen={!true} /> */}
         </TooltipProvider>
-        {/* <ErrorBadge /> */}
       </QueryClientProvider>
     </StrictMode>,
   );

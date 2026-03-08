@@ -1,4 +1,5 @@
 import DeckDropdown from "@/components/deck-dropdown";
+import { useProgressColors } from "@/components/debug-tools";
 import NonIdealState from "@/components/non-ideal-state";
 import ProjectIcon from "@/components/project-icon";
 import { Button } from "@/components/ui/button";
@@ -116,6 +117,7 @@ function DeckRow({
   onToggleExpanded,
 }: DeckRowProps) {
   const queryClient = useQueryClient();
+  const colors = useProgressColors();
   return (
     <NavLink
       key={deck.id}
@@ -172,42 +174,47 @@ function DeckRow({
       <div className="flex items-center gap-0.5 w-20 shrink-0">
         {deck.cardCount > 0 ? (
           <>
-            {deck.new > 0 && (
+            {deck.reviewing > 0 && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
-                    className="h-2 rounded-[2px] border border-blue-500/50 bg-blue-500/15"
-                    style={{ flex: deck.new }}
+                    className={`h-2 rounded-[2px] border ${colors.reviewing.border} ${colors.reviewing.bg}`}
+                    style={{ flex: deck.reviewing }}
                   />
                 </TooltipTrigger>
-                <TooltipContent>{deck.new} new</TooltipContent>
+                <TooltipContent>{deck.reviewing} reviewing</TooltipContent>
               </Tooltip>
             )}
             {deck.learning > 0 && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
-                    className="h-2 rounded-[2px] border border-orange-500/50 bg-orange-500/15"
+                    className={`h-2 rounded-[2px] border ${colors.learning.border} ${colors.learning.bg}`}
                     style={{ flex: deck.learning }}
                   />
                 </TooltipTrigger>
                 <TooltipContent>{deck.learning} learning</TooltipContent>
               </Tooltip>
             )}
-            {deck.reviewing > 0 && (
+            {deck.new > 0 && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
-                    className="h-2 rounded-[2px] border border-green-500/50 bg-green-500/15"
-                    style={{ flex: deck.reviewing }}
+                    className={`h-2 rounded-[2px] border ${colors.new.border} ${colors.new.bg}`}
+                    style={{ flex: deck.new }}
                   />
                 </TooltipTrigger>
-                <TooltipContent>{deck.reviewing} due</TooltipContent>
+                <TooltipContent>{deck.new} new</TooltipContent>
               </Tooltip>
             )}
           </>
         ) : (
-          <div className="h-3 w-full rounded-[2px] border border-border/50 bg-muted/30" />
+          <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="h-2 w-full rounded-[2px] border border-border/50 bg-muted/30" />
+              </TooltipTrigger>
+              <TooltipContent>No cards</TooltipContent>
+            </Tooltip>
         )}
       </div>
       <DeckDropdown deck={deck}>
