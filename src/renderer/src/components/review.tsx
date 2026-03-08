@@ -1,8 +1,8 @@
 import { useDueCards } from "@/queries/card-queries";
 import { useDeck, useDeckPath } from "@/queries/deck-queries";
 import { useCreateReview } from "@/queries/review-queries";
-import { IconAlignLeft, IconArrowLeft } from "@tabler/icons-react";
-import { useState } from "react";
+import { IconArrowLeft } from "@tabler/icons-react";
+import { useRef, useState } from "react";
 import { NavLink, useParams } from "react-router";
 import { Button } from "./ui/button";
 
@@ -20,21 +20,28 @@ export function Review() {
   const deckId = id ?? null;
 
   const { data: due } = useDueCards(deckId);
+  const snapshotRef = useRef(due);
+  // Freeze the queue on first load
+  if (snapshotRef.current === undefined && due !== undefined) {
+    snapshotRef.current = due;
+  }
+  const queue = snapshotRef.current;
+
   const { data: path, isPending, isError } = useDeckPath(id ?? "");
 
   const { mutateAsync: createReview } = useCreateReview();
 
-  if (due === undefined || (id && deck === undefined)) {
+  if (queue === undefined || (id && deck === undefined)) {
     // TODO: @loading
     return <div>Loading...</div>;
   }
 
   const handleNext = () => {
-    setCardIdx((prev) => Math.min(prev + 1, due.length));
+    setCardIdx((prev) => Math.min(prev + 1, queue.length));
   };
 
   const handleRate = async (rating: "forgot" | "hard" | "good" | "easy") => {
-    const card = due[cardIdx];
+    const card = queue[cardIdx];
     if (card) {
       await createReview({
         deckId: card.deckId ?? id ?? "",
@@ -87,16 +94,16 @@ export function Review() {
         </div>
       </header>
 
-      {due.length > 0 && (
+      {queue.length > 0 && (
         <div className="flex items-center justify-center p-4 flex-col">
           <div className="text-muted-foreground">
-            {cardIdx + 1} / {due.length}
+            {cardIdx + 1} / {queue.length}
           </div>
           <div className="w-96 bg-neutral-200 border border-neutral-300 h-5 rounded-full overflow-clip">
             <div
               className="bg-success h-full transition-all ease-in-out duration-300"
               style={{
-                width: `${(cardIdx / due.length) * 100}%`,
+                width: `${(cardIdx / queue.length) * 100}%`,
               }}
             ></div>
           </div>
@@ -129,7 +136,7 @@ export function Review() {
       </div> */}
 
       <main className="w-lg mx-auto pt-16 px-5 ">
-        {cardIdx >= due.length && (
+        {cardIdx >= queue.length && (
           <div className="flex flex-col items-center">
             <div className="text-muted-foreground text-center p-4">
               No cards to review
@@ -139,28 +146,26 @@ export function Review() {
             </Button>
           </div>
         )}
-        {cardIdx < due.length && (
+        {cardIdx < queue.length && (
           <>
             <div className="border rounded-md max-w-lg bg-background overflow-hidden">
               <div className="p-2 flex flex-col gap-1">
-                <div className="text-xs border rounded-sm w-fit px-1 flex items-center gap-1">
-                  <IconAlignLeft className="size-3" />
+                <div className="text-xs rounded-sm w-fit px-1.5 flex items-center gap-1 bg-muted text-muted-foreground font-medium">
                   Front
                 </div>
                 {card.front.length > 0 ? (
-                  <span className="font-content">{card.front}</span>
+                  <div className="whitespace-pre-wrap break-words font-content">{card.front}</div>
                 ) : (
                   <span className="text-muted-foreground">Empty</span>
                 )}
               </div>
               {show && (
-                <div className="p-2 flex flex-col gap-1  border-t border-dashed ">
-                  <div className="text-xs border rounded-sm w-fit px-1 flex items-center gap-1">
-                    <IconAlignLeft className="size-3" />
+                <div className="p-2 flex flex-col gap-1 border-t border-dashed">
+                  <div className="text-xs rounded-sm w-fit px-1.5 flex items-center gap-1 bg-muted text-muted-foreground font-medium">
                     Back
                   </div>
                   {card.back.length > 0 ? (
-                    <span className="font-content">{card.back}</span>
+                    <div className="whitespace-pre-wrap break-words font-content">{card.back}</div>
                   ) : (
                     <span className="text-muted-foreground">Empty</span>
                   )}

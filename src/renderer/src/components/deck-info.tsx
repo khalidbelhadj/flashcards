@@ -20,10 +20,13 @@ import { useDeck, useDecks, useSetLastReviewed } from "@/queries/deck-queries";
 import {
   IconCards,
   IconChevronDown,
+  IconChevronLeft,
+  IconChevronRight,
   IconCircleDashed,
   IconSparkles,
 } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 
 function ReviewButton({ id }: { id: string }) {
@@ -62,15 +65,23 @@ function ReviewButton({ id }: { id: string }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => navigate(`/decks/${id}/review?mode=cram`)}>
+          <DropdownMenuItem
+            onClick={() => navigate(`/decks/${id}/review?mode=cram`)}
+          >
             <IconCards className="size-4" />
             Cram all cards
-            <span className="ml-auto text-xs text-muted-foreground">{deck?.cardCount ?? 0}</span>
+            <Badge variant="secondary" className="ml-auto">
+              {deck?.cardCount ?? 0}
+            </Badge>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate(`/decks/${id}/review?mode=new`)}>
+          <DropdownMenuItem
+            onClick={() => navigate(`/decks/${id}/review?mode=new`)}
+          >
             <IconSparkles className="size-4" />
             Review new only
-            <span className="ml-auto text-xs text-muted-foreground">{deck?.new ?? 0}</span>
+            <Badge variant="secondary" className="ml-auto">
+              {deck?.new ?? 0}
+            </Badge>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -152,7 +163,7 @@ export default function DeckInfo({ id }: { id: string }) {
             subDecks?.length !== 0 && "pb-5",
           )}
         >
-          <div className="flex items-center gap-2 overflow-auto">
+          <ScrollableRow>
             {isSubdecksPending &&
               Array.from({ length: 3 }).map((_) => (
                 <Skeleton className="min-w-36 w-36 px-2 h-7 rounded-md font-medium flex items-center gap-1"></Skeleton>
@@ -182,9 +193,78 @@ export default function DeckInfo({ id }: { id: string }) {
                   <TooltipContent side="bottom">{deck.name}</TooltipContent>
                 </Tooltip>
               ))}
-          </div>
+          </ScrollableRow>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ScrollableRow({ children }: { children: React.ReactNode }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    const resizeObserver = new ResizeObserver(checkScroll);
+    resizeObserver.observe(el);
+    const mutationObserver = new MutationObserver(checkScroll);
+    mutationObserver.observe(el, { childList: true, subtree: true });
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    return () => {
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      el.removeEventListener("scroll", checkScroll);
+    };
+  }, [checkScroll]);
+
+  const scroll = (direction: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction === "left" ? -150 : 150, behavior: "smooth" });
+  };
+
+  return (
+    <div className="relative">
+      {canScrollLeft && (
+        <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center bg-gradient-to-r from-card from-60% to-transparent pr-4">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => scroll("left")}
+          >
+            <IconChevronLeft className="size-4" />
+          </Button>
+        </div>
+      )}
+      <div
+        ref={scrollRef}
+        className="flex items-center gap-2 overflow-x-auto scrollbar-hide"
+        style={{ scrollbarWidth: "none" }}
+      >
+        {children}
+      </div>
+      {canScrollRight && (
+        <div className="absolute right-0 top-0 bottom-0 z-10 flex items-center bg-gradient-to-l from-card from-60% to-transparent pl-4">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => scroll("right")}
+          >
+            <IconChevronRight className="size-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
