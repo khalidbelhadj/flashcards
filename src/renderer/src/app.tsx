@@ -12,6 +12,7 @@ export default function App() {
         <Route index element={<Home />} />
         <Route path="/ui" element={<UI />} />
         <Route path="/decks/:id" element={<Deck />} />
+        <Route path="/review" element={<Review />} />
         <Route path="/decks/:id/review" element={<Review />} />
       </Route>
     </Routes>

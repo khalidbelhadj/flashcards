@@ -25,19 +25,19 @@ import { cn } from "@/lib/utils";
 
 export function Review() {
   const { id } = useParams<{ id: string }>();
-  if (!id) throw new Error("Deck ID is required");
 
   const [show, setShow] = useState(false);
   const [cardIdx, setCardIdx] = useState(0);
 
-  const { data: deck } = useDeck(id);
+  const { data: deck } = useDeck(id ?? "");
+  const deckId = id ?? null;
 
-  const { data: due } = useDueCards(id);
-  const { data: path, isPending, isError } = useDeckPath(id);
+  const { data: due } = useDueCards(deckId);
+  const { data: path, isPending, isError } = useDeckPath(id ?? "");
 
   const { mutateAsync: createReview } = useCreateReview();
 
-  if (deck === undefined || due === undefined) {
+  if (due === undefined || (id && deck === undefined)) {
     // TODO: @loading
     return <div>Loading...</div>;
   }
@@ -46,52 +46,13 @@ export function Review() {
     setCardIdx((prev) => Math.min(prev + 1, due.length));
   };
 
-  const handleForgot = async () => {
+  const handleRate = async (rating: "forgot" | "hard" | "good" | "easy") => {
     const card = due[cardIdx];
     if (card) {
       await createReview({
-        deckId: id,
+        deckId: card.deckId ?? id ?? "",
         cardId: card.id,
-        rating: "forgot",
-      });
-    }
-    handleNext();
-    setShow(false);
-  };
-
-  const handleHard = async () => {
-    const card = due[cardIdx];
-    if (card) {
-      await createReview({
-        deckId: id,
-        cardId: card.id,
-        rating: "hard",
-      });
-    }
-    handleNext();
-    setShow(false);
-  };
-
-  const handleGood = async () => {
-    const card = due[cardIdx];
-    if (card) {
-      await createReview({
-        deckId: id,
-        cardId: card.id,
-        rating: "good",
-      });
-    }
-    handleNext();
-    setShow(false);
-  };
-
-  const handleEasy = async () => {
-    const card = due[cardIdx];
-    if (card) {
-      await createReview({
-        deckId: id,
-        cardId: card.id,
-        rating: "easy",
+        rating,
       });
     }
     handleNext();
@@ -110,17 +71,29 @@ export function Review() {
           asChild
           icon={<IconArrowLeft className="size-4" />}
         >
-          <NavLink to={`/decks/${deck.id}`}>Exit</NavLink>
+          <NavLink to={id ? `/decks/${id}` : `/`}>Exit</NavLink>
         </Button>
         <Breadcrumb className="absolute left-1/2 -translate-x-1/2 ">
           <BreadcrumbList className="flex-nowrap">
-            {isError && (
+            {!id && (
+              <>
+                <BreadcrumbItem>
+                  <NavLink to={`/`}>Decks</NavLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem className="text-foreground">
+                  All cards
+                </BreadcrumbItem>
+              </>
+            )}
+
+            {id && isError && (
               <div className="text-destructive">Could not get path</div>
             )}
 
-            {isPending && <Skeleton className="h-5 w-24" />}
+            {id && isPending && <Skeleton className="h-5 w-24" />}
 
-            {!isPending && !isError && (
+            {id && !isPending && !isError && (
               <>
                 <BreadcrumbItem>
                   <NavLink to={`/`}>Decks</NavLink>
@@ -225,7 +198,7 @@ export function Review() {
               No cards to review
             </div>
             <Button asChild>
-              <NavLink to={`/decks/${deck.id}`}>Back to deck</NavLink>
+              <NavLink to={id ? `/decks/${id}` : `/`}>Back to {id ? "deck" : "decks"}</NavLink>
             </Button>
           </div>
         )}
@@ -238,7 +211,7 @@ export function Review() {
                   Front
                 </div>
                 {card.front.length > 0 ? (
-                  card.front
+                  <span className="font-content">{card.front}</span>
                 ) : (
                   <span className="text-muted-foreground">Empty</span>
                 )}
@@ -250,7 +223,7 @@ export function Review() {
                     Back
                   </div>
                   {card.back.length > 0 ? (
-                    card.back
+                    <span className="font-content">{card.back}</span>
                   ) : (
                     <span className="text-muted-foreground">Empty</span>
                   )}
@@ -272,10 +245,10 @@ export function Review() {
                 <div className="flex flex-col gap-1">
                   <Button onClick={() => setShow(false)}>Hide Answer</Button>
                   <div className="flex items-center gap-1">
-                    <Button onClick={handleForgot}>Forgot</Button>
-                    <Button onClick={handleHard}>Hard</Button>
-                    <Button onClick={handleGood}>Good</Button>
-                    <Button onClick={handleEasy}>Easy</Button>
+                    <Button onClick={() => handleRate("forgot")}>Forgot</Button>
+                    <Button onClick={() => handleRate("hard")}>Hard</Button>
+                    <Button onClick={() => handleRate("good")}>Good</Button>
+                    <Button onClick={() => handleRate("easy")}>Easy</Button>
                   </div>
                 </div>
               )}

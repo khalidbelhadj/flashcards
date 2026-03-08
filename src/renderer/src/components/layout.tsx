@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { DeckSearch } from "./deck-search";
+import DebugTools from "./debug-tools";
 import DeleteDeckDialog from "./delete-deck-dialog";
 import MoveDeckDialog from "./move-deck-dialog";
 import NewDeckDialog from "./new-deck-dialog";
@@ -62,56 +63,12 @@ function Layout() {
   const { openDialogue } = useDeckDialogue();
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.metaKey && e.key === "d") {
-        e.preventDefault();
-        document.documentElement.classList.toggle("dark");
-        return;
-      }
-
-      if (e.metaKey && e.key === "u") {
-        e.preventDefault();
-        navigate("/ui");
-        return;
-      }
-
-      if (e.metaKey && e.key === "p") {
-        e.preventDefault();
-        setShowSearch((prev) => !prev);
-        return;
-      }
-
-      if (e.metaKey && e.key === "n") {
-        e.preventDefault();
-        openDialogue({ type: "new", id: null });
-        return;
-      }
-
-      if (e.metaKey && e.key === "[") {
-        navigate(-1);
-        return;
-      }
-
-      if (e.metaKey && e.key === "]") {
-        navigate(1);
-        return;
-      }
-
-      if (e.metaKey && e.key === "ArrowUp") {
-        alert("TODO: navigate up");
-        return;
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [navigate, openDialogue]);
 
   return (
     <div className="w-screen h-screen bg-background-dark relative overflow-hidden">
       <DeckSearch open={showSearch} onOpenChange={setShowSearch} />
       <DeckDialogues />
+      <DebugTools />
       <Outlet />
     </div>
   );

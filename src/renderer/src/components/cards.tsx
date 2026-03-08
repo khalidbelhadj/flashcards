@@ -34,7 +34,7 @@ export default function Cards({ id }: { id: string }) {
           <div className="flex items-center gap-2">
             <Input
               icon={<IconSearch className="size-4" />}
-              className="bg-background !h-7 w-52 rounded-full"
+              className="bg-background w-52 rounded-full"
               placeholder="Search"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}

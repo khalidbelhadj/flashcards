@@ -21,6 +21,7 @@ import { IconChevronRight, IconDots, IconPlus } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { NavLink } from "react-router";
+import { Badge } from "./ui/badge";
 
 interface DecksHeaderProps {
   isPending: boolean;
@@ -58,9 +59,9 @@ function DecksHeader({
         {!isPending && !isError && (
           <Tooltip>
             <TooltipTrigger>
-              <div className="bg-muted w-fit px-1 rounded-sm text-xs">
+              <Badge className="bg-muted" variant="secondary">
                 {allDecks.length}
-              </div>
+              </Badge>
             </TooltipTrigger>
             <TooltipContent>{allDecks.length} decks</TooltipContent>
           </Tooltip>
@@ -120,7 +121,7 @@ function DeckRow({
       to={`/decks/${deck.id}`}
       draggable
       className={cn(
-        "flex items-center gap-0.5 p-1 hover:bg-accent font-medium relative group",
+        "flex items-center gap-0.5 p-0.5 hover:bg-accent font-medium relative group",
         draggedDeck === deck.id && "opacity-50",
         dragOverDeck === deck.id && "bg-blue-100 dark:bg-blue-900/30",
         isDragging && draggedDeck === deck.id && "cursor-grabbing",
@@ -159,8 +160,48 @@ function DeckRow({
         />
       </Button>
 
-      <div className="flex-1">{deck.name}</div>
-      <div>{deck.cardCount}</div>
+      <div className="flex-1 truncate">{deck.name}</div>
+      <div className="flex items-center gap-0.5 w-20 shrink-0">
+        {deck.cardCount > 0 ? (
+          <>
+            {deck.new > 0 && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className="h-2 rounded-[2px] border border-blue-500/50 bg-blue-500/15"
+                    style={{ flex: deck.new }}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>{deck.new} new</TooltipContent>
+              </Tooltip>
+            )}
+            {deck.learning > 0 && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className="h-2 rounded-[2px] border border-orange-500/50 bg-orange-500/15"
+                    style={{ flex: deck.learning }}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>{deck.learning} learning</TooltipContent>
+              </Tooltip>
+            )}
+            {deck.reviewing > 0 && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className="h-2 rounded-[2px] border border-green-500/50 bg-green-500/15"
+                    style={{ flex: deck.reviewing }}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>{deck.reviewing} due</TooltipContent>
+              </Tooltip>
+            )}
+          </>
+        ) : (
+          <div className="h-3 w-full rounded-[2px] border border-border/50 bg-muted/30" />
+        )}
+      </div>
       <DeckDropdown deck={deck}>
         <Button
           className="p-1 h-full w-fit ml-auto hover:bg-muted"
@@ -179,7 +220,6 @@ function DeckRow({
 }
 
 export default function Decks() {
-  const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     const value = localStorage.getItem("expanded");
     if (value === null) return new Set();

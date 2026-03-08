@@ -1,6 +1,12 @@
 import ProjectIcon from "@/components/project-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -11,13 +17,20 @@ import { useDeckDialogue } from "@/contexts/deck-dialogue-context";
 import { cn, formatDate, formatNumber, prefetchDeck } from "@/lib/utils";
 import { useDueCards } from "@/queries/card-queries";
 import { useDeck, useDecks, useSetLastReviewed } from "@/queries/deck-queries";
-import { IconCircleDashed, IconPlus } from "@tabler/icons-react";
+import {
+  IconCards,
+  IconChevronDown,
+  IconCircleDashed,
+  IconPlus,
+  IconSparkles,
+} from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { NavLink, useNavigate } from "react-router";
 
 function ReviewButton({ id }: { id: string }) {
   const navigate = useNavigate();
   const { data: due } = useDueCards(id);
+  const { data: deck } = useDeck(id);
 
   const { mutateAsync: setLastReviewed } = useSetLastReviewed(id);
 
@@ -27,18 +40,41 @@ function ReviewButton({ id }: { id: string }) {
   };
 
   return (
-    <div className="flex items-center flex-nowrap">
+    <div className="flex items-center flex-nowrap gap-0">
       <Button
-        className="shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_1px_2px_rgba(0,0,0,0.1)]"
+        className="-mr-px rounded-r-none shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_1px_2px_rgba(0,0,0,0.1)]"
         variant="default"
         onClick={handleReview}
         icon={<IconCircleDashed />}
       >
         Review
-        <Badge className="py-0 !text-xs px-1 rounded-[4.5px] bg-[hsl(214,81%,66%)]">
+        <Badge className="py-0 !text-xs px-1 rounded-[4.5px] bg-primary-foreground/20 text-primary-foreground">
           {formatNumber(due?.length ?? 0)}
         </Badge>
       </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            className="rounded-l-none border-l border-l-black/10 shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_1px_2px_rgba(0,0,0,0.1)]"
+            variant="default"
+            size="icon"
+          >
+            <IconChevronDown className="size-3.5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => navigate(`/decks/${id}/review?mode=cram`)}>
+            <IconCards className="size-4" />
+            Cram all cards
+            <span className="ml-auto text-xs text-muted-foreground">{deck?.cardCount ?? 0}</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate(`/decks/${id}/review?mode=new`)}>
+            <IconSparkles className="size-4" />
+            Review new only
+            <span className="ml-auto text-xs text-muted-foreground">{deck?.new ?? 0}</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
@@ -137,7 +173,7 @@ export default function DeckInfo({ id }: { id: string }) {
             {!isSubdecksPending &&
               !isSubdecksError &&
               subDecks?.map((deck) => (
-                <Tooltip>
+                <Tooltip delayDuration={500}>
                   <TooltipTrigger>
                     <NavLink
                       to={`/decks/${deck.id}`}

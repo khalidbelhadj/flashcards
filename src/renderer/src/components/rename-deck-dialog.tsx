@@ -38,7 +38,7 @@ export default function RenameDeckDialogue({
   };
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false}>
+      <DialogContent showCloseButton={false} onOpenAutoFocus={(e) => { e.preventDefault(); renameRef.current?.focus(); }}>
         <DialogHeader className="flex flex-row justify-between items-center">
           <DialogTitle>Rename deck</DialogTitle>
           <Button variant="ghost" size="icon-sm" onClick={onClose}>

@@ -11,13 +11,14 @@ import { Deck } from "@/lib/utils";
 import { useResetDeckHistory } from "@/queries/card-queries";
 import {
   IconArrowsMove,
+  IconCheck,
   IconCopy,
   IconEdit,
   IconPlus,
   IconRefresh,
   IconTrash,
 } from "@tabler/icons-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function DeckDropdown({
   deck,
@@ -29,6 +30,8 @@ export default function DeckDropdown({
   align?: "start" | "end" | "center";
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const copiedTimeout = useRef<ReturnType<typeof setTimeout>>();
   const { mutateAsync: resetDeckHistory } = useResetDeckHistory();
   const { openDialogue } = useDeckDialogue();
 
@@ -37,25 +40,29 @@ export default function DeckDropdown({
   };
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <DropdownMenu open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) setCopied(false); }}>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent align={align} onClick={(e) => e.stopPropagation()}>
+      <DropdownMenuContent align={align} onClick={(e) => e.stopPropagation()} onCloseAutoFocus={(e) => e.preventDefault()}>
         <DropdownMenuGroup>
           <DropdownMenuItem
             onSelect={() => {
               setIsOpen(false);
-              openDialogue({ type: "new", id: deck.id });
+              setTimeout(() => openDialogue({ type: "new", id: deck.id }));
             }}
           >
             <IconPlus className="size-icon" />
             New deck
           </DropdownMenuItem>
           <DropdownMenuItem
-            onSelect={() => {
+            onSelect={(e) => {
+              e.preventDefault();
               navigator.clipboard.writeText(deck.id);
+              setCopied(true);
+              clearTimeout(copiedTimeout.current);
+              copiedTimeout.current = setTimeout(() => setCopied(false), 1500);
             }}
           >
-            <IconCopy className="size-icon" />
+            {copied ? <IconCheck className="size-icon" /> : <IconCopy className="size-icon" />}
             Copy ID
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleResetDeckHistory}>
@@ -66,11 +73,11 @@ export default function DeckDropdown({
           <DropdownMenuItem
             onSelect={() => {
               setIsOpen(false);
-              openDialogue({
+              setTimeout(() => openDialogue({
                 type: "move",
                 id: deck.id,
                 parentId: deck.parentId,
-              });
+              }));
             }}
           >
             <IconArrowsMove className="size-icon" />
@@ -79,7 +86,7 @@ export default function DeckDropdown({
           <DropdownMenuItem
             onSelect={() => {
               setIsOpen(false);
-              openDialogue({ type: "rename", id: deck.id, name: deck.name });
+              setTimeout(() => openDialogue({ type: "rename", id: deck.id, name: deck.name }));
             }}
           >
             <IconEdit className="size-icon" />
@@ -88,9 +95,9 @@ export default function DeckDropdown({
           <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"
-            onSelect={async () => {
+            onSelect={() => {
               setIsOpen(false);
-              openDialogue({ type: "delete", id: deck.id });
+              setTimeout(() => openDialogue({ type: "delete", id: deck.id }));
             }}
           >
             <IconTrash className="size-icon text-destructive" />

@@ -43,7 +43,7 @@ export function Card({ card, onSelect }: CardProps) {
           Front
         </div>
         {card.front.length > 0 ? (
-          <div className="whitespace-pre-wrap break-words">{card.front}</div>
+          <div className="whitespace-pre-wrap break-words font-content">{card.front}</div>
         ) : (
           <span className="text-muted-foreground">Empty</span>
         )}
@@ -53,7 +53,7 @@ export function Card({ card, onSelect }: CardProps) {
           Back
         </div>
         {card.back.length > 0 ? (
-          <div className="whitespace-pre-wrap break-words">{card.back}</div>
+          <div className="whitespace-pre-wrap break-words font-content">{card.back}</div>
         ) : (
           <span className="text-muted-foreground">Empty</span>
         )}

@@ -46,7 +46,7 @@ export default function NewDeckDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false}>
+      <DialogContent showCloseButton={false} onOpenAutoFocus={(e) => { e.preventDefault(); newDeckNameRef.current?.focus(); }}>
         <DialogHeader className="flex flex-row justify-between items-center">
           <DialogTitle>New deck</DialogTitle>
           <Button variant="ghost" size="icon-sm" onClick={onClose}>

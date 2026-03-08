@@ -1,125 +1,149 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.5rem;
+  --app-font: "Inter", sans-serif;
+  --app-content-font: "Inter", sans-serif;
+  --radius: 0.7rem;
   --icon-sm: calc(var(--spacing) * 3);
   --icon: calc(var(--spacing) * 4);
   --icon-lg: calc(var(--spacing) * 5);
 
-  /* Backgrounds */
-  --background: hsl(0, 0%, 100%);
-  --background-dark: hsl(0, 0%, 97%);
-  --background-darker: hsl(240, 9%, 96%);
+  /* Default stone base colors */
+  --background: oklch(1 0 0);
+  --background-dark: oklch(0.97 0 0);
+  --background-darker: oklch(0.955 0.001 106);
+  --foreground: oklch(0.147 0.004 49.25);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.147 0.004 49.25);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.147 0.004 49.25);
 
-  /* Text colors */
-  --foreground: hsl(214, 0%, 25%);
+  /* Blue primary override */
+  --primary: oklch(0.588 0.178 259);
+  --primary-foreground: oklch(0.97 0 0);
 
-  /* Brand colors */
-  --primary: hsl(214, 80%, 56%);
-  --primary-foreground: hsl(214, 0%, 95%);
-  --secondary: hsl(214, 0%, 90%);
-  --secondary-foreground: hsl(214, 0%, 40%);
-  --muted: hsl(214, 0%, 94%);
-  --muted-foreground: hsl(214, 0%, 50%);
-  --accent: hsl(214, 0%, 97%);
-  --accent-foreground: hsl(214, 0%, 40%);
+  /* Default stone */
+  --secondary: oklch(0.97 0.001 106.424);
+  --secondary-foreground: oklch(0.216 0.006 56.043);
+  --muted: oklch(0.97 0.001 106.424);
+  --muted-foreground: oklch(0.553 0.013 58.071);
+  --accent: oklch(0.97 0.001 106.424);
+  --accent-foreground: oklch(0.216 0.006 56.043);
+  --destructive: oklch(0.577 0.245 27.325);
 
-  /* Supporting colors */
-  --destructive: hsl(360deg, 80.9%, 59%);
-  --destructive-background: hsl(0deg, 85.7%, 97.3%);
-  --destructive-foreground: hsl(360deg, 80.9%, 95%);
-  --destructive-foreground-dark: hsl(360deg, 80.9%, 15%);
+  /* App-specific supporting colors */
+  --destructive-background: oklch(0.971 0.013 17.4);
+  --destructive-foreground: oklch(0.97 0.013 27);
+  --destructive-foreground-dark: oklch(0.25 0.06 27);
+  --success: oklch(0.596 0.178 145);
+  --success-background: oklch(0.962 0.031 150);
+  --success-foreground: oklch(0.97 0.02 145);
+  --success-foreground-dark: oklch(0.25 0.06 145);
+  --warning: oklch(0.72 0.174 72);
+  --warning-background: oklch(0.962 0.038 95);
+  --warning-foreground: oklch(0.97 0.02 72);
+  --warning-foreground-dark: oklch(0.25 0.06 72);
+  --info: oklch(0.588 0.178 259);
+  --info-background: oklch(0.962 0.025 250);
+  --info-foreground: oklch(0.97 0.02 259);
+  --info-foreground-dark: oklch(0.25 0.06 259);
 
-  --success: hsl(142deg, 69.6%, 43.9%);
-  --success-background: hsl(143deg, 88.9%, 96.5%);
-  --success-foreground: hsl(142deg, 69.6%, 95%);
-  --success-foreground-dark: hsl(142deg, 69.6%, 15%);
-
-  --warning: hsl(45.6deg, 94.1%, 46.9%);
-  --warning-background: hsl(54.5deg, 91.7%, 95.3%);
-  --warning-foreground: hsl(45.6deg, 94.1%, 95%);
-  --warning-foreground-dark: hsl(45.6deg, 94.1%, 15%);
-
-  --info: hsl(217deg, 80%, 56.9%);
-  --info-background: hsl(212deg, 100%, 96.7%);
-  --info-foreground: hsl(217deg, 80%, 95%);
-  --info-foreground-dark: hsl(217deg, 80%, 15%);
-
-  /* Borders */
-  --border: hsl(320, 0%, 90%);
-  --input: hsl(320, 0%, 90%);
-  --ring: var(--primary);
+  /* Default stone borders */
+  --border: oklch(0.923 0.003 48.717);
+  --input: oklch(0.923 0.003 48.717);
+  --ring: oklch(0.588 0.178 259);
 
   /* Charts */
-  --chart-1: hsl(24, 138%, 40%);
-  --chart-2: hsl(176, 177%, 21%);
-  --chart-3: hsl(196, 72%, 23%);
-  --chart-4: hsl(47, 160%, 39%);
-  --chart-5: hsl(41, 156%, 39%);
+  --chart-1: oklch(0.897 0.196 126.665);
+  --chart-2: oklch(0.768 0.233 130.85);
+  --chart-3: oklch(0.648 0.2 131.684);
+  --chart-4: oklch(0.532 0.157 131.589);
+  --chart-5: oklch(0.453 0.124 130.933);
 
   /* Sidebar */
-  --sidebar: hsl(240, 0%, 98%);
-  --sidebar-foreground: hsl(0, 0%, 4%);
-  --sidebar-primary: hsl(330, 0%, 9%);
-  --sidebar-primary-foreground: hsl(240, 0%, 98%);
-  --sidebar-accent: hsl(300, 0%, 96%);
-  --sidebar-accent-foreground: hsl(330, 0%, 9%);
-  --sidebar-border: hsl(320, 0%, 90%);
-  --sidebar-ring: hsl(0, 0%, 63%);
+  --sidebar: oklch(0.985 0.001 106.423);
+  --sidebar-foreground: oklch(0.147 0.004 49.25);
+  --sidebar-primary: oklch(0.588 0.178 259);
+  --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
+  --sidebar-accent: oklch(0.97 0.001 106.424);
+  --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
+  --sidebar-border: oklch(0.923 0.003 48.717);
+  --sidebar-ring: oklch(0.588 0.178 259);
 }
 
 .dark {
-  /* scrollbar-gutter: stable; */
   color-scheme: dark;
-  /* Backgrounds */
-  --background: hsl(214, 0%, 12%);
-  --background-dark: hsl(214, 0%, 9%);
-  --background-darker: hsl(214, 0%, 6%);
 
-  /* Text colors */
-  --foreground: hsl(214, 0%, 90%);
+  /* Dark mode with better contrast */
+  --background: oklch(0.16 0.004 49);
+  --background-dark: oklch(0.13 0.003 49);
+  --background-darker: oklch(0.10 0.002 49);
+  --foreground: oklch(0.985 0.001 106.423);
+  --card: oklch(0.205 0.006 56);
+  --card-foreground: oklch(0.985 0.001 106.423);
+  --popover: oklch(0.22 0.006 56);
+  --popover-foreground: oklch(0.985 0.001 106.423);
 
-  /* Brand colors */
-  --primary: hsl(214, 81%, 56%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(214, 0%, 90%);
-  --secondary-foreground: hsl(0, 0%, 31%);
-  --muted: hsl(214, 0%, 15%);
-  --muted-foreground: hsl(0, 0%, 45%);
-  --accent: hsl(214, 0%, 18%);
-  --accent-foreground: hsl(0, 0%, 45%);
+  /* Blue primary stays blue */
+  --primary: oklch(0.62 0.178 259);
+  --primary-foreground: oklch(1 0 0);
 
-  /* Supporting colors */
-  --destructive: hsl(360deg, 80.9%, 59%);
-  --destructive-background: hsl(0deg, 85.7%, 97.3%);
-  --destructive-foreground: hsl(360deg, 80.9%, 95%);
-  --destructive-foreground-dark: hsl(360deg, 80.9%, 15%);
+  /* Higher contrast dark */
+  --secondary: oklch(0.25 0.007 34);
+  --secondary-foreground: oklch(0.985 0.001 106.423);
+  --muted: oklch(0.25 0.007 34);
+  --muted-foreground: oklch(0.65 0.01 56);
+  --accent: oklch(0.25 0.007 34);
+  --accent-foreground: oklch(0.985 0.001 106.423);
+  --destructive: oklch(0.704 0.191 22.216);
 
-  --success: hsl(142deg, 69.6%, 43.9%);
-  --success-background: hsl(143deg, 88.9%, 96.5%);
-  --success-foreground: hsl(142deg, 69.6%, 95%);
-  --success-foreground-dark: hsl(142deg, 69.6%, 15%);
+  /* App-specific supporting colors (dark) */
+  --destructive-background: oklch(0.3 0.08 22);
+  --destructive-foreground: oklch(0.97 0.013 27);
+  --destructive-foreground-dark: oklch(0.25 0.06 27);
+  --success: oklch(0.596 0.178 145);
+  --success-background: oklch(0.3 0.06 145);
+  --success-foreground: oklch(0.97 0.02 145);
+  --success-foreground-dark: oklch(0.25 0.06 145);
+  --warning: oklch(0.72 0.174 72);
+  --warning-background: oklch(0.3 0.06 72);
+  --warning-foreground: oklch(0.97 0.02 72);
+  --warning-foreground-dark: oklch(0.25 0.06 72);
+  --info: oklch(0.588 0.178 259);
+  --info-background: oklch(0.3 0.06 259);
+  --info-foreground: oklch(0.97 0.02 259);
+  --info-foreground-dark: oklch(0.25 0.06 259);
 
-  --warning: hsl(45.6deg, 94.1%, 46.9%);
-  --warning-background: hsl(54.5deg, 91.7%, 95.3%);
-  --warning-foreground: hsl(45.6deg, 94.1%, 95%);
-  --warning-foreground-dark: hsl(45.6deg, 94.1%, 15%);
+  /* More visible borders */
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.588 0.178 259);
 
-  --info: hsl(217deg, 80%, 56.9%);
-  --info-background: hsl(212deg, 100%, 96.7%);
-  --info-foreground: hsl(217deg, 80%, 95%);
-  --info-foreground-dark: hsl(217deg, 80%, 15%);
+  /* Charts */
+  --chart-1: oklch(0.897 0.196 126.665);
+  --chart-2: oklch(0.768 0.233 130.85);
+  --chart-3: oklch(0.648 0.2 131.684);
+  --chart-4: oklch(0.532 0.157 131.589);
+  --chart-5: oklch(0.453 0.124 130.933);
 
-  /* Borders */
-  --border: hsl(0deg, 0%, 18%);
-  --input: var(--border);
-  --ring: var(--primary);
+  /* Sidebar */
+  --sidebar: oklch(0.216 0.006 56.043);
+  --sidebar-foreground: oklch(0.985 0.001 106.423);
+  --sidebar-primary: oklch(0.588 0.178 259);
+  --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
+  --sidebar-accent: oklch(0.268 0.007 34.298);
+  --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.588 0.178 259);
 }
 
 @theme inline {
+  --font-sans: var(--app-font);
+  --font-content: var(--app-content-font);
   --size-icon-sm: var(--icon-sm);
   --size-icon: var(--icon);
   --size-icon-lg: var(--icon-lg);
@@ -127,6 +151,10 @@
   --color-background-dark: var(--background-dark);
   --color-background-darker: var(--background-darker);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -155,10 +183,6 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -167,16 +191,24 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --color-success: var(--success);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    font-family: "Inter", sans-serif;
   }
   body {
     @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
   }
 
   button {
